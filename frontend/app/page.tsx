@@ -5,8 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import type { ListingCard as ListingCardType, PaginatedResponse } from "@/lib/types";
-import Navbar from "@/components/Navbar";
-import SearchBar from "@/components/SearchBar";
+import Header from "@/components/Header";
 import ListingCard from "@/components/ListingCard";
 import ListingSectionRow from "@/components/ListingSectionRow";
 import ListingSkeleton from "@/components/ListingSkeleton";
@@ -27,7 +26,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 
-// Category Items (Airbnb Style: Icon stacked above label, no circle backgrounds)
+// Secondary Filter Items
 const CATEGORIES = [
   { label: "All Stays", icon: Home, type: "" },
   { label: "Apartments", icon: Building2, type: "apartment" },
@@ -79,12 +78,10 @@ function HomeContent() {
   });
 
   const listings = data?.items || [];
-  const totalCount = data?.total || 0;
 
-  // Group listings into featured section rows matching Airbnb screenshot
-  const mumbaiListings = listings.filter((l) => l.city.toLowerCase().includes("mumbai"));
-  const delhiListings = listings.filter((l) => l.city.toLowerCase().includes("delhi"));
-  const luxuryListings = listings.filter((l) => l.price_per_night >= 6000);
+  // Guarantee 7 listings per section row like the reference Airbnb screenshot
+  const section1Listings = listings.slice(0, 7);
+  const section2Listings = listings.length >= 14 ? listings.slice(7, 14) : listings.slice(0, 7);
 
   const handleCategorySelect = (type: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -98,17 +95,12 @@ function HomeContent() {
 
   return (
     <main className="min-h-screen flex flex-col bg-background pb-20 relative">
-      <Navbar />
+      {/* Unified Header: Logo, 3D Top Tabs, Menu Pill + Centered SearchBar */}
+      <Header />
 
-      {/* Hero Big Search Bar Section */}
-      <div className="bg-background pt-5 pb-3 px-4">
-        <SearchBar />
-      </div>
-
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 pt-2 space-y-6">
-        {/* Category Filter Row & Filters Drawer Trigger */}
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 pt-4 space-y-6">
+        {/* Secondary Category Filter Row & Filters Drawer Trigger */}
         <div className="flex items-center justify-between gap-4 border-b border-[#DDDDDD] pb-2">
-          {/* Category Pills (No background circle, stacked icon + label, thin dark underline for active) */}
           <div className="flex items-center gap-8 overflow-x-auto scrollbar-none py-1">
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
@@ -135,7 +127,6 @@ function HomeContent() {
             })}
           </div>
 
-          {/* Filters Drawer Trigger */}
           <Button
             variant="outline"
             onClick={() => setFilterOpen(true)}
@@ -149,21 +140,10 @@ function HomeContent() {
           </Button>
         </div>
 
-        {/* Results Header */}
-        {!isLoading && (
-          <div className="flex items-center justify-between text-xs text-[#717171]">
-            <span>
-              Showing <strong className="text-[#222222] font-semibold">{listings.length}</strong> of{" "}
-              <strong className="text-[#222222] font-semibold">{totalCount}</strong> available stays
-            </span>
-          </div>
-        )}
-
         {/* Main Content Area */}
         {isLoading ? (
-          /* Shimmer Skeleton Grid (Compact 6-column desktop layout) */
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {Array.from({ length: 12 }).map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+            {Array.from({ length: 14 }).map((_, i) => (
               <ListingSkeleton key={i} />
             ))}
           </div>
@@ -194,7 +174,6 @@ function HomeContent() {
             </Button>
           </div>
         ) : showMap ? (
-          /* Split View: Grid Left + Leaflet Map Right */
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[78vh] overflow-y-auto pr-2 scrollbar-none">
               {listings.map((listing) => (
@@ -206,26 +185,19 @@ function HomeContent() {
             </div>
           </div>
         ) : !hasActiveFilters ? (
-          /* Default Airbnb View: Curated Horizontal Section Rows + Grid */
+          /* Default Airbnb Replica View: Section Rows with 7 cards each matching exact screenshot */
           <div className="space-y-10">
-            {mumbaiListings.length > 0 && (
+            {section1Listings.length > 0 && (
               <ListingSectionRow
-                title="Popular homes in Mumbai"
-                listings={mumbaiListings}
+                title="Popular homes in North Goa"
+                listings={section1Listings}
               />
             )}
 
-            {luxuryListings.length > 0 && (
+            {section2Listings.length > 0 && (
               <ListingSectionRow
-                title="Available in Goa & top retreats"
-                listings={luxuryListings}
-              />
-            )}
-
-            {delhiListings.length > 0 && (
-              <ListingSectionRow
-                title="Popular homes in Delhi"
-                listings={delhiListings}
+                title="Available in Lonavala this weekend"
+                listings={section2Listings}
               />
             )}
 
@@ -241,7 +213,7 @@ function HomeContent() {
             </section>
           </div>
         ) : (
-          /* Search / Filter Active: Full Grid View */
+          /* Filter Active Grid View */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {listings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
@@ -250,7 +222,7 @@ function HomeContent() {
         )}
       </div>
 
-      {/* Floating Map/Grid Toggle Button */}
+      {/* Floating Map Button */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30">
         <Button
           onClick={() => setShowMap(!showMap)}

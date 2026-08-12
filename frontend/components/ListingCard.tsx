@@ -32,19 +32,19 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const checkInStr = searchParams.get("check_in");
   const checkOutStr = searchParams.get("check_out");
 
-  let nights = 0;
+  let nights = 2; // Default to 2 nights like Airbnb screenshot
   if (checkInStr && checkOutStr) {
     try {
       const d1 = parseISO(checkInStr);
       const d2 = parseISO(checkOutStr);
       nights = Math.max(1, differenceInCalendarDays(d2, d1));
     } catch {
-      nights = 0;
+      nights = 2;
     }
   }
 
-  // Superhost / Guest Favourite badge criteria: avg_rating >= 4.8
-  const isGuestFavourite = listing.avg_rating >= 4.8;
+  // Guest favourite badge criteria: avg_rating >= 4.7
+  const isGuestFavourite = listing.avg_rating >= 4.7;
 
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -70,7 +70,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         await apiFetch(`/wishlist/${listing.id}`, { method: "POST" });
         toast.success("Saved to wishlist!");
       }
-    } catch (err) {
+    } catch {
       if (wishlisted) addToWishlist(listing.id);
       else removeFromWishlist(listing.id);
       toast.error("Failed to update wishlist");
@@ -92,25 +92,19 @@ export default function ListingCard({ listing }: ListingCardProps) {
   };
 
   const pricePerNight = listing.price_per_night;
-  const totalPriceForNights = pricePerNight * (nights || 2); // Default to 2 nights like Airbnb screenshot if no date
-
-  const formattedNightPrice = new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(pricePerNight);
+  const totalPrice = pricePerNight * nights;
 
   const formattedTotalPrice = new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(totalPriceForNights);
+  }).format(totalPrice);
 
   return (
     <Link href={`/listing/${listing.id}`} className="group block cursor-pointer">
       <div className="bg-transparent border-none space-y-2">
         {/* Photo Container with Carousel & Badges */}
-        <div className="relative aspect-square w-full bg-[#EBEBEB] rounded-2xl overflow-hidden">
+        <div className="relative aspect-[1.05/1] w-full bg-[#EBEBEB] rounded-[18px] overflow-hidden">
           <img
             src={photos[currentImageIndex]}
             alt={listing.title}
@@ -138,7 +132,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </>
           )}
 
-          {/* Carousel Dot Indicators (centered bottom, visible on hover) */}
+          {/* Carousel Dot Indicators */}
           {photos.length > 1 && (
             <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
               {photos.map((_, idx) => (
@@ -154,7 +148,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
           {/* "Guest favourite" Badge (top-left) */}
           {isGuestFavourite && (
-            <div className="absolute top-2.5 left-2.5 bg-white/95 text-[#222222] font-semibold text-[11px] px-2.5 py-0.5 rounded-full shadow-md backdrop-blur-xs z-10">
+            <div className="absolute top-2.5 left-2.5 bg-white/95 text-[#222222] font-semibold text-[11px] px-2.5 py-0.5 rounded-full shadow-xs backdrop-blur-xs z-10">
               Guest favourite
             </div>
           )}
@@ -178,19 +172,17 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </button>
         </div>
 
-        {/* Text Content — Compact Airbnb Exact Layout */}
-        <div className="space-y-0.5 text-left">
-          {/* Row 1: Title (e.g. Apartment in Candolim / Title) */}
+        {/* Text Content — Exact Airbnb Formatting */}
+        <div className="space-y-0.5 text-left pt-0.5">
+          {/* Row 1: Title (e.g. Apartment in Candolim) */}
           <h3 className="font-semibold text-[14px] text-[#222222] truncate leading-tight">
             {listing.title}
           </h3>
 
-          {/* Row 2: Subtext Price & Rating on same line (e.g. ₹15,485 for 2 nights · ★ 4.92) */}
+          {/* Row 2: Price & Rating on same line (e.g. ₹15,485 for 2 nights · ★ 4.92) */}
           <div className="text-[13px] text-[#717171] truncate flex items-center gap-1">
             <span>
-              {nights > 0
-                ? `${formattedTotalPrice} for ${nights} ${nights === 1 ? "night" : "nights"}`
-                : `${formattedNightPrice} night`}
+              {formattedTotalPrice} for {nights} {nights === 1 ? "night" : "nights"}
             </span>
             {listing.avg_rating > 0 && (
               <>
