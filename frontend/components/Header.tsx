@@ -40,9 +40,9 @@ export default function Header() {
 
   return (
     <>
-      <header className="w-full bg-background border-b border-[#DDDDDD] pt-3.5 pb-5">
+      <header className="w-full bg-background border-b border-[#DDDDDD] pt-4 pb-6">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          {/* Top Row: Logo (Left) | User's Exact Downloaded 3D Icons in Center | Host + Globe + Menu Pill (Right) */}
+          {/* Top Row: Logo (Left) | Airbnb 3D Category Icons (Center) | Host + Globe + Menu Pill (Right) */}
           <div className="flex items-center justify-between gap-4">
             {/* LEFT: Brand Logo */}
             <Link href="/" className="flex items-center gap-2 group shrink-0">
@@ -54,77 +54,109 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* CENTER: User's Exact Downloaded Airbnb 3D Category Icons */}
-            <nav className="flex items-center gap-9">
+            {/* CENTER: Exact Airbnb 3D Category Icons & Underline */}
+            <nav className="flex items-center gap-10">
               {/* All */}
               <button
                 onClick={() => setActiveTopTab("all")}
-                className={`flex items-center gap-2 pb-2 relative transition-all group ${
-                  activeTopTab === "all" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
-                }`}
+                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
               >
-                <img
-                  src="/icons/all.png"
-                  alt="All"
-                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
-                />
-                <span className="text-[13px]">All</span>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/icons/all.png"
+                    alt="All"
+                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                  />
+                  <span
+                    className={`text-[14px] ${
+                      activeTopTab === "all"
+                        ? "font-bold text-[#222222]"
+                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    }`}
+                  >
+                    All
+                  </span>
+                </div>
                 {activeTopTab === "all" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
+                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
                 )}
               </button>
 
               {/* Homes */}
               <button
                 onClick={() => setActiveTopTab("homes")}
-                className={`flex items-center gap-2 pb-2 relative transition-all group ${
-                  activeTopTab === "homes" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
-                }`}
+                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
               >
-                <img
-                  src="/icons/homes.png"
-                  alt="Homes"
-                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
-                />
-                <span className="text-[13px]">Homes</span>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/icons/homes.png"
+                    alt="Homes"
+                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                  />
+                  <span
+                    className={`text-[14px] ${
+                      activeTopTab === "homes"
+                        ? "font-bold text-[#222222]"
+                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    }`}
+                  >
+                    Homes
+                  </span>
+                </div>
                 {activeTopTab === "homes" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
+                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
                 )}
               </button>
 
               {/* Experiences */}
               <button
                 onClick={() => setActiveTopTab("experiences")}
-                className={`flex items-center gap-2 pb-2 relative transition-all group ${
-                  activeTopTab === "experiences" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
-                }`}
+                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
               >
-                <img
-                  src="/icons/experiences.png"
-                  alt="Experiences"
-                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
-                />
-                <span className="text-[13px]">Experiences</span>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/icons/experiences.png"
+                    alt="Experiences"
+                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                  />
+                  <span
+                    className={`text-[14px] ${
+                      activeTopTab === "experiences"
+                        ? "font-bold text-[#222222]"
+                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    }`}
+                  >
+                    Experiences
+                  </span>
+                </div>
                 {activeTopTab === "experiences" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
+                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
                 )}
               </button>
 
               {/* Services */}
               <button
                 onClick={() => setActiveTopTab("services")}
-                className={`flex items-center gap-2 pb-2 relative transition-all group ${
-                  activeTopTab === "services" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
-                }`}
+                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
               >
-                <img
-                  src="/icons/services.png"
-                  alt="Services"
-                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
-                />
-                <span className="text-[13px]">Services</span>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/icons/services.png"
+                    alt="Services"
+                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                  />
+                  <span
+                    className={`text-[14px] ${
+                      activeTopTab === "services"
+                        ? "font-bold text-[#222222]"
+                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    }`}
+                  >
+                    Services
+                  </span>
+                </div>
                 {activeTopTab === "services" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
+                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
                 )}
               </button>
             </nav>
@@ -260,7 +292,7 @@ export default function Header() {
           </div>
 
           {/* Row 2: Big 3-Segment Search Bar Centered Directly Below Top Category Icons */}
-          <div className="pt-1 flex justify-center">
+          <div className="pt-2 flex justify-center">
             <SearchBar />
           </div>
         </div>
