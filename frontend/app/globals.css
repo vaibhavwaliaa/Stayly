@@ -5,16 +5,15 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-brand: #E9385C;
-  --color-brand-hover: #D02B4C;
-  --color-brand-light: #FFF1F3;
+  --color-brand: #FF385C;
+  --color-brand-hover: #E00B41;
   --color-airbnb-dark: #222222;
   --color-airbnb-muted: #717171;
   --color-airbnb-border: #DDDDDD;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
   --font-mono: monospace;
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -37,7 +36,6 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
 }
 
 :root {
@@ -47,7 +45,7 @@
   --card-foreground: #222222;
   --popover: #FFFFFF;
   --popover-foreground: #222222;
-  --primary: #E9385C;
+  --primary: #FF385C;
   --primary-foreground: #FFFFFF;
   --secondary: #F7F7F7;
   --secondary-foreground: #222222;
@@ -55,10 +53,10 @@
   --muted-foreground: #717171;
   --accent: #F7F7F7;
   --accent-foreground: #222222;
-  --destructive: #E53935;
-  --border: #EBEBEB;
+  --destructive: #E11D48;
+  --border: #DDDDDD;
   --input: #DDDDDD;
-  --ring: #E9385C;
+  --ring: #FF385C;
   --radius: 0.75rem;
 }
 
@@ -69,7 +67,7 @@
   --card-foreground: #F7F7F7;
   --popover: #1E1E1E;
   --popover-foreground: #F7F7F7;
-  --primary: #E9385C;
+  --primary: #FF385C;
   --primary-foreground: #FFFFFF;
   --secondary: #2A2A2A;
   --secondary-foreground: #F7F7F7;
@@ -77,10 +75,10 @@
   --muted-foreground: #A0A0A0;
   --accent: #2A2A2A;
   --accent-foreground: #F7F7F7;
-  --destructive: #EF5350;
+  --destructive: #F43F5E;
   --border: #333333;
   --input: #444444;
-  --ring: #E9385C;
+  --ring: #FF385C;
 }
 
 @layer base {
@@ -92,23 +90,33 @@
   }
 }
 
-/* Custom Airbnb-style Micro-interactions & Utilities */
-.card-hover-effect {
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1);
-}
-.card-hover-effect:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+/* Shimmer animation for Skeleton loading states */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
-.pill-search-bar {
-  border-radius: 9999px;
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
 }
-.pill-search-bar:hover {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.18), 0 6px 20px rgba(0,0,0,0.08);
+.animate-shimmer::after {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.7) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 1.5s infinite;
+  content: '';
 }
 
 .scrollbar-none {

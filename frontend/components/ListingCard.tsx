@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Star, Heart, MapPin } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "next/navigation";
+import { Star, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { apiFetch } from "@/lib/api";
 import type { ListingCard as ListingCardType } from "@/lib/types";
+import { getListingPhotos } from "@/lib/photos";
+import { differenceInCalendarDays, parseISO } from "date-fns";
 import { toast } from "sonner";
 
 interface ListingCardProps {
@@ -14,12 +16,35 @@ interface ListingCardProps {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
+  const searchParams = useSearchParams();
   const { user, isWishlisted, addToWishlist, removeFromWishlist } = useStore();
   const wishlisted = isWishlisted(listing.id);
-  const [toggling, setToggling] = useState(false);
 
-  // Superhost criteria: rating >= 4.8 and review_count >= 5 (or seeded high rating)
-  const isSuperhost = listing.avg_rating >= 4.8 && listing.review_count >= 2;
+  // Carousel State
+  const photos = getListingPhotos(listing.id, listing.cover_photo_url);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Heart Animation State
+  const [toggling, setToggling] = useState(false);
+  const [isHeartAnimating, setIsHeartAnimating] = useState(false);
+
+  // Check if date range is active in search params
+  const checkInStr = searchParams.get("check_in");
+  const checkOutStr = searchParams.get("check_out");
+
+  let nights = 0;
+  if (checkInStr && checkOutStr) {
+    try {
+      const d1 = parseISO(checkInStr);
+      const d2 = parseISO(checkOutStr);
+      nights = Math.max(1, differenceInCalendarDays(d2, d1));
+    } catch {
+      nights = 0;
+    }
+  }
+
+  // Superhost / Guest Favourite badge criteria: avg_rating >= 4.8
+  const isGuestFavourite = listing.avg_rating >= 4.8;
 
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,6 +57,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
     if (toggling) return;
     setToggling(true);
+    setIsHeartAnimating(true);
+    setTimeout(() => setIsHeartAnimating(false), 200);
 
     try {
       if (wishlisted) {
@@ -44,89 +71,154 @@ export default function ListingCard({ listing }: ListingCardProps) {
         toast.success("Saved to wishlist!");
       }
     } catch (err) {
-      // Rollback optimistic update on error
-      if (wishlisted) {
-        addToWishlist(listing.id);
-      } else {
-        removeFromWishlist(listing.id);
-      }
+      if (wishlisted) addToWishlist(listing.id);
+      else removeFromWishlist(listing.id);
       toast.error("Failed to update wishlist");
     } finally {
       setToggling(false);
     }
   };
 
-  const formattedPrice = new Intl.NumberFormat("en-IN", {
+  const handlePrevPhoto = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+  };
+
+  const handleNextPhoto = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+  };
+
+  const pricePerNight = listing.price_per_night;
+  const totalPriceForNights = pricePerNight * (nights || 1);
+
+  const formattedNightPrice = new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(listing.price_per_night);
+  }).format(pricePerNight);
 
-  const defaultPhoto =
-    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80";
+  const formattedTotalPrice = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(totalPriceForNights);
 
   return (
     <Link href={`/listing/${listing.id}`} className="group block cursor-pointer">
-      <div className="card-hover-effect rounded-2xl overflow-hidden border bg-card transition-all">
-        {/* Photo Container */}
-        <div className="relative aspect-4/3 sm:aspect-square bg-muted overflow-hidden">
+      <div className="bg-transparent border-none">
+        {/* Photo Container with Carousel & Badges */}
+        <div className="relative aspect-square w-full bg-[#EBEBEB] rounded-2xl overflow-hidden mb-3">
           <img
-            src={listing.cover_photo_url || defaultPhoto}
+            src={photos[currentImageIndex]}
             alt={listing.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
             loading="lazy"
           />
 
-          {/* Wishlist Heart Button */}
+          {/* Carousel Chevrons (visible on hover) */}
+          {photos.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrevPhoto}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextPhoto}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          )}
+
+          {/* Carousel Dot Indicators (centered bottom, visible on hover) */}
+          {photos.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+              {photos.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                    idx === currentImageIndex ? "bg-white scale-125" : "bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* "Guest favourite" Badge (top-left) */}
+          {isGuestFavourite && (
+            <div className="absolute top-3 left-3 bg-white/95 text-[#222222] font-semibold text-[12px] px-3 py-1 rounded-full shadow-md backdrop-blur-xs z-10">
+              Guest favourite
+            </div>
+          )}
+
+          {/* Heart Icon Button (top-right) */}
           <button
+            type="button"
             onClick={handleWishlistToggle}
-            className="absolute top-3 right-3 p-2 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-xs text-white transition-all z-10"
+            className={`absolute top-3 right-3 p-1.5 rounded-full transition-all duration-200 z-10 ${
+              isHeartAnimating ? "scale-110" : "scale-100"
+            }`}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart
-              className={`w-4 h-4 transition-colors ${
-                wishlisted ? "fill-[#E9385C] text-[#E9385C]" : "text-white"
+              className={`w-5 h-5 transition-colors stroke-[2.5] ${
+                wishlisted
+                  ? "fill-[#FF385C] text-[#FF385C] stroke-[#FF385C]"
+                  : "fill-black/30 text-white stroke-white drop-shadow-md"
               }`}
             />
           </button>
-
-          {/* Superhost Badge */}
-          {isSuperhost && (
-            <Badge className="absolute top-3 left-3 bg-white/90 dark:bg-black/80 text-foreground backdrop-blur-xs text-xs font-semibold px-2 py-0.5 border-none">
-              ★ Superhost
-            </Badge>
-          )}
-
-          {/* Property Type Pill */}
-          <span className="absolute bottom-3 left-3 text-[10px] font-bold uppercase tracking-wider bg-black/60 text-white px-2 py-0.5 rounded-md backdrop-blur-xs">
-            {listing.property_type}
-          </span>
         </div>
 
-        {/* Info Content */}
-        <div className="p-3.5 space-y-1">
-          <div className="flex justify-between items-start gap-2">
-            <h3 className="font-semibold text-sm line-clamp-1 text-foreground group-hover:text-[#E9385C] transition-colors">
+        {/* Text Content */}
+        <div className="space-y-0.5">
+          {/* Row 1: Title (left) & Rating (right) on the SAME row */}
+          <div className="flex justify-between items-baseline gap-2">
+            <h3 className="font-semibold text-[15px] text-[#222222] line-clamp-1">
               {listing.title}
             </h3>
             {listing.avg_rating > 0 ? (
-              <div className="flex items-center gap-1 text-xs font-medium shrink-0">
-                <Star className="w-3.5 h-3.5 fill-current text-yellow-500" />
+              <div className="flex items-center gap-1 text-sm font-medium text-[#222222] shrink-0">
+                <Star className="w-3.5 h-3.5 fill-current text-[#222222]" />
                 <span>{listing.avg_rating.toFixed(2)}</span>
               </div>
             ) : (
-              <span className="text-xs text-muted-foreground shrink-0">New</span>
+              <span className="text-xs font-medium text-[#717171] shrink-0">New</span>
             )}
           </div>
 
-          <p className="text-xs text-muted-foreground flex items-center gap-1 line-clamp-1">
-            <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
+          {/* Row 2: Location as gray-500 */}
+          <p className="text-[14px] text-[#717171] line-clamp-1">
             {listing.city}, {listing.country}
           </p>
 
-          <div className="pt-1 flex items-baseline gap-1">
-            <span className="font-bold text-sm text-foreground">{formattedPrice}</span>
-            <span className="text-xs text-muted-foreground">night</span>
+          {/* Row 3: Price */}
+          <div className="pt-1 text-[14px]">
+            {nights > 0 ? (
+              <div>
+                <span className="font-semibold text-[#222222]">
+                  {formattedTotalPrice}
+                </span>{" "}
+                <span className="text-[#717171]">
+                  for {nights} {nights === 1 ? "night" : "nights"}
+                </span>
+              </div>
+            ) : (
+              <div>
+                <span className="font-semibold text-[#222222]">
+                  {formattedNightPrice}
+                </span>{" "}
+                <span className="text-[#717171]">night</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

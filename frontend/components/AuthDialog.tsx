@@ -152,7 +152,7 @@ export default function AuthDialog({
 
           <Button
             type="submit"
-            className="w-full bg-[#E9385C] hover:bg-[#D02B4C] text-white font-semibold py-2.5 rounded-lg transition mt-2"
+            className="w-full bg-[#FF385C] hover:bg-[#D02B4C] text-white font-semibold py-2.5 rounded-lg transition mt-2"
             disabled={loading}
           >
             {loading ? (
@@ -175,7 +175,7 @@ export default function AuthDialog({
               <button
                 type="button"
                 onClick={() => handleModeSwitch("signup")}
-                className="font-semibold text-foreground underline hover:text-[#E9385C]"
+                className="font-semibold text-foreground underline hover:text-[#FF385C]"
               >
                 Sign up
               </button>

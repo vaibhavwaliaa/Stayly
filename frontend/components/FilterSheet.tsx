@@ -112,7 +112,7 @@ export default function FilterSheet({ open, onOpenChange }: FilterSheetProps) {
         <div className="space-y-6">
           <SheetHeader className="border-b pb-4">
             <SheetTitle className="text-xl font-bold flex items-center gap-2">
-              <SlidersHorizontal className="w-5 h-5 text-[#E9385C]" />
+              <SlidersHorizontal className="w-5 h-5 text-[#FF385C]" />
               Filters
             </SheetTitle>
             <SheetDescription className="text-xs">
@@ -164,7 +164,7 @@ export default function FilterSheet({ open, onOpenChange }: FilterSheetProps) {
                   onClick={() => setPropertyType(type.value)}
                   className={`p-3 rounded-xl border text-sm font-medium text-center transition ${
                     propertyType === type.value
-                      ? "border-[#E9385C] bg-[#E9385C]/10 text-[#E9385C] font-semibold"
+                      ? "border-[#FF385C] bg-[#FF385C]/10 text-[#FF385C] font-semibold"
                       : "hover:bg-muted"
                   }`}
                 >
@@ -214,7 +214,7 @@ export default function FilterSheet({ open, onOpenChange }: FilterSheetProps) {
           <Button
             type="button"
             onClick={handleApply}
-            className="flex-1 bg-[#E9385C] hover:bg-[#D02B4C] text-white rounded-xl text-xs font-semibold"
+            className="flex-1 bg-[#FF385C] hover:bg-[#D02B4C] text-white rounded-xl text-xs font-semibold"
           >
             Show results
           </Button>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, MapPin, Calendar as CalendarIcon, Users, Plus, Minus, X } from "lucide-react";
+import { Search, MapPin, Calendar as CalendarIcon, Users, Plus, Minus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -72,37 +72,35 @@ export default function SearchBar() {
   return (
     <form
       onSubmit={handleSearch}
-      className="w-full max-w-4xl mx-auto bg-card border rounded-full shadow-lg p-2 flex flex-col md:flex-row items-center gap-2 transition-all hover:shadow-xl"
+      className="w-full max-w-4xl mx-auto bg-card border border-[#DDDDDD] rounded-full shadow-md p-1.5 flex flex-col md:flex-row items-center transition-all hover:shadow-lg"
     >
-      {/* 1. Location Input */}
-      <div className="flex-1 w-full flex items-center gap-3 px-4 py-2 hover:bg-muted/50 rounded-full transition cursor-pointer">
-        <MapPin className="w-5 h-5 text-[#E9385C] shrink-0" />
+      {/* 1. Where Zone */}
+      <div className="flex-1 w-full flex items-center gap-3 px-6 py-2.5 hover:bg-[#EBEBEB] dark:hover:bg-muted rounded-full transition cursor-pointer group">
         <div className="w-full">
-          <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          <label className="block text-[11px] font-bold tracking-tight text-[#222222]">
             Where
           </label>
           <input
             type="text"
-            placeholder="Search destinations (e.g. Mumbai, Paris)"
+            placeholder="Search destinations"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full bg-transparent text-sm font-semibold text-foreground focus:outline-none placeholder:text-muted-foreground/60 placeholder:font-normal"
+            className="w-full bg-transparent text-sm font-normal text-[#222222] focus:outline-none placeholder:text-[#717171]"
           />
         </div>
       </div>
 
-      <div className="hidden md:block h-8 w-px bg-border"></div>
+      <div className="hidden md:block h-8 w-px bg-[#DDDDDD] shrink-0"></div>
 
-      {/* 2. Dates Picker */}
+      {/* 2. When Zone */}
       <Popover>
         <PopoverTrigger>
-          <div className="flex-1 w-full flex items-center gap-3 px-4 py-2 hover:bg-muted/50 rounded-full transition cursor-pointer">
-            <CalendarIcon className="w-5 h-5 text-[#E9385C] shrink-0" />
+          <div className="flex-1 w-full flex items-center gap-3 px-6 py-2.5 hover:bg-[#EBEBEB] dark:hover:bg-muted rounded-full transition cursor-pointer text-left">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              <label className="block text-[11px] font-bold tracking-tight text-[#222222]">
                 When
               </label>
-              <div className="text-sm font-semibold text-foreground line-clamp-1">
+              <div className="text-sm font-normal text-[#222222] line-clamp-1">
                 {dateRange?.from ? (
                   dateRange.to ? (
                     `${format(dateRange.from, "MMM d")} - ${format(dateRange.to, "MMM d")}`
@@ -110,14 +108,14 @@ export default function SearchBar() {
                     format(dateRange.from, "MMM d")
                   )
                 ) : (
-                  <span className="text-muted-foreground font-normal">Add dates</span>
+                  <span className="text-[#717171]">Add dates</span>
                 )}
               </div>
             </div>
           </div>
         </PopoverTrigger>
 
-        <PopoverContent align="center" className="w-auto p-4 rounded-2xl shadow-xl">
+        <PopoverContent align="center" className="w-auto p-4 rounded-3xl shadow-2xl border-[#DDDDDD]">
           <Calendar
             mode="range"
             selected={dateRange}
@@ -129,36 +127,39 @@ export default function SearchBar() {
         </PopoverContent>
       </Popover>
 
-      <div className="hidden md:block h-8 w-px bg-border"></div>
+      <div className="hidden md:block h-8 w-px bg-[#DDDDDD] shrink-0"></div>
 
-      {/* 3. Guests Stepper */}
+      {/* 3. Who Zone */}
       <Popover>
         <PopoverTrigger>
-          <div className="flex-1 w-full flex items-center gap-3 px-4 py-2 hover:bg-muted/50 rounded-full transition cursor-pointer">
-            <Users className="w-5 h-5 text-[#E9385C] shrink-0" />
+          <div className="flex-1 w-full flex items-center gap-3 px-6 py-2.5 hover:bg-[#EBEBEB] dark:hover:bg-muted rounded-full transition cursor-pointer text-left">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              <label className="block text-[11px] font-bold tracking-tight text-[#222222]">
                 Who
               </label>
-              <div className="text-sm font-semibold text-foreground">
-                {guests === 1 ? "1 guest" : `${guests} guests`}
+              <div className="text-sm font-normal text-[#222222]">
+                {guests === 1 ? (
+                  <span className="text-[#717171]">Add guests</span>
+                ) : (
+                  `${guests} guests`
+                )}
               </div>
             </div>
           </div>
         </PopoverTrigger>
 
-        <PopoverContent align="end" className="w-72 p-4 rounded-2xl shadow-xl">
+        <PopoverContent align="end" className="w-72 p-4 rounded-3xl shadow-2xl border-[#DDDDDD]">
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-semibold text-sm">Guests</div>
-              <div className="text-xs text-muted-foreground">Adults, children, infants</div>
+              <div className="font-semibold text-sm text-[#222222]">Guests</div>
+              <div className="text-xs text-[#717171]">Adults, children, infants</div>
             </div>
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setGuests((g) => Math.max(1, g - 1))}
                 disabled={guests <= 1}
-                className="w-8 h-8 rounded-full border flex items-center justify-center hover:border-foreground disabled:opacity-30 transition"
+                className="w-8 h-8 rounded-full border border-[#DDDDDD] flex items-center justify-center hover:border-[#222222] disabled:opacity-30 transition"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
@@ -167,7 +168,7 @@ export default function SearchBar() {
                 type="button"
                 onClick={() => setGuests((g) => Math.min(16, g + 1))}
                 disabled={guests >= 16}
-                className="w-8 h-8 rounded-full border flex items-center justify-center hover:border-foreground disabled:opacity-30 transition"
+                className="w-8 h-8 rounded-full border border-[#DDDDDD] flex items-center justify-center hover:border-[#222222] disabled:opacity-30 transition"
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -176,14 +177,14 @@ export default function SearchBar() {
         </PopoverContent>
       </Popover>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2 w-full md:w-auto justify-end pr-1">
+      {/* Action Search Button */}
+      <div className="flex items-center gap-2 w-full md:w-auto justify-end pr-1.5 py-1">
         {hasFilters && (
           <Button
             type="button"
             variant="ghost"
             onClick={handleClear}
-            className="rounded-full text-xs text-muted-foreground hover:text-foreground"
+            className="rounded-full text-xs text-[#717171] hover:text-[#222222]"
           >
             Clear
           </Button>
@@ -191,10 +192,10 @@ export default function SearchBar() {
 
         <Button
           type="submit"
-          className="w-full md:w-auto bg-[#E9385C] hover:bg-[#D02B4C] text-white font-semibold rounded-full px-6 py-6 shadow-md transition-all hover:scale-105 flex items-center justify-center gap-2"
+          className="w-full md:w-auto bg-[#FF385C] hover:bg-[#E00B41] text-white font-bold rounded-full p-3.5 md:p-4 shadow-md transition-all hover:scale-105 flex items-center justify-center gap-2"
         >
           <Search className="w-4 h-4 stroke-[3]" />
-          <span className="md:hidden font-bold">Search</span>
+          <span className="md:hidden font-bold text-sm">Search</span>
         </Button>
       </div>
     </form>
