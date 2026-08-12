@@ -40,9 +40,9 @@ export default function Header() {
 
   return (
     <>
-      <header className="w-full bg-background border-b border-[#DDDDDD] pt-4 pb-6">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
-          {/* Top Row: Logo (Left) | 3D Top Tabs (Center) | Host + Globe + Menu Pill (Right) */}
+      <header className="w-full bg-background border-b border-[#DDDDDD] pt-3.5 pb-5">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+          {/* Top Row: Logo (Left) | User's Exact Downloaded 3D Icons in Center | Host + Globe + Menu Pill (Right) */}
           <div className="flex items-center justify-between gap-4">
             {/* LEFT: Brand Logo */}
             <Link href="/" className="flex items-center gap-2 group shrink-0">
@@ -54,21 +54,21 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* CENTER: Top Category Tabs (All, Homes, Experiences, Services) */}
-            <nav className="flex items-center gap-8 text-sm font-medium">
+            {/* CENTER: User's Exact Downloaded Airbnb 3D Category Icons */}
+            <nav className="flex items-center gap-9">
               {/* All */}
               <button
                 onClick={() => setActiveTopTab("all")}
-                className={`flex items-center gap-2.5 pb-2 relative transition-all group ${
+                className={`flex items-center gap-2 pb-2 relative transition-all group ${
                   activeTopTab === "all" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
                 }`}
               >
                 <img
-                  src="https://a0.muscache.com/pictures/50861fca-582c-4bcc-99d3-857fb7ca6528.jpg"
+                  src="/icons/all.png"
                   alt="All"
-                  className="w-7 h-7 object-contain"
+                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
                 />
-                <span className="text-sm">All</span>
+                <span className="text-[13px]">All</span>
                 {activeTopTab === "all" && (
                   <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
                 )}
@@ -77,16 +77,16 @@ export default function Header() {
               {/* Homes */}
               <button
                 onClick={() => setActiveTopTab("homes")}
-                className={`flex items-center gap-2.5 pb-2 relative transition-all group ${
+                className={`flex items-center gap-2 pb-2 relative transition-all group ${
                   activeTopTab === "homes" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
                 }`}
               >
                 <img
-                  src="https://a0.muscache.com/pictures/4b4f4050-9d2f-4772-9913-93645b216380.jpg"
+                  src="/icons/homes.png"
                   alt="Homes"
-                  className="w-7 h-7 object-contain"
+                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
                 />
-                <span className="text-sm">Homes</span>
+                <span className="text-[13px]">Homes</span>
                 {activeTopTab === "homes" && (
                   <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
                 )}
@@ -95,16 +95,16 @@ export default function Header() {
               {/* Experiences */}
               <button
                 onClick={() => setActiveTopTab("experiences")}
-                className={`flex items-center gap-2.5 pb-2 relative transition-all group ${
+                className={`flex items-center gap-2 pb-2 relative transition-all group ${
                   activeTopTab === "experiences" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
                 }`}
               >
                 <img
-                  src="https://a0.muscache.com/pictures/3b1eb541-46d9-4bef-abc4-c37d77e3c21b.jpg"
+                  src="/icons/experiences.png"
                   alt="Experiences"
-                  className="w-7 h-7 object-contain"
+                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
                 />
-                <span className="text-sm">Experiences</span>
+                <span className="text-[13px]">Experiences</span>
                 {activeTopTab === "experiences" && (
                   <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
                 )}
@@ -113,16 +113,16 @@ export default function Header() {
               {/* Services */}
               <button
                 onClick={() => setActiveTopTab("services")}
-                className={`flex items-center gap-2.5 pb-2 relative transition-all group ${
+                className={`flex items-center gap-2 pb-2 relative transition-all group ${
                   activeTopTab === "services" ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
                 }`}
               >
                 <img
-                  src="https://a0.muscache.com/pictures/e22b031f-f14d-446a-8b83-f32a76f272a2.jpg"
+                  src="/icons/services.png"
                   alt="Services"
-                  className="w-7 h-7 object-contain"
+                  className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
                 />
-                <span className="text-sm">Services</span>
+                <span className="text-[13px]">Services</span>
                 {activeTopTab === "services" && (
                   <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
                 )}
@@ -259,8 +259,8 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Row 2: Big 3-Segment Search Bar Centered Directly Below Top Tabs */}
-          <div className="pt-2 flex justify-center">
+          {/* Row 2: Big 3-Segment Search Bar Centered Directly Below Top Category Icons */}
+          <div className="pt-1 flex justify-center">
             <SearchBar />
           </div>
         </div>
