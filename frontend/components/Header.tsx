@@ -41,132 +41,134 @@ export default function Header() {
   return (
     <>
       <header className="w-full bg-background border-b border-[#DDDDDD] pt-4 pb-6">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          {/* Top Row: Logo (Left) | Airbnb 3D Category Icons (Center) | Host + Globe + Menu Pill (Right) */}
-          <div className="flex items-center justify-between gap-4">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+          
+          {/* Top Row: Grid layout for perfect centering */}
+          <div className="grid grid-cols-3 items-center">
+            
             {/* LEFT: Brand Logo */}
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <div className="p-2 rounded-xl bg-[#FF385C] text-white group-hover:scale-105 transition-transform">
-                <Home className="w-5 h-5 fill-current" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-[#FF385C]">
-                stayly
-              </span>
-            </Link>
+            <div className="flex justify-start">
+              <Link href="/" className="flex items-center gap-2 group shrink-0">
+                <div className="p-1.5 rounded-xl bg-[#FF385C] text-white group-hover:scale-105 transition-transform">
+                  <Home className="w-5 h-5 fill-current" />
+                </div>
+                <span className="text-[22px] font-bold tracking-tight text-[#FF385C]">
+                  stayly
+                </span>
+              </Link>
+            </div>
 
             {/* CENTER: Exact Airbnb 3D Category Icons & Underline */}
-            <nav className="flex items-center gap-10">
-              {/* All */}
-              <button
-                onClick={() => setActiveTopTab("all")}
-                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
+            <div className="flex justify-center">
+              <nav className="flex items-center gap-8">
+                {/* All */}
+                <button
+                  onClick={() => setActiveTopTab("all")}
+                  className={`flex flex-col items-center gap-2 pb-2 border-b-2 transition-all cursor-pointer ${
+                    activeTopTab === "all"
+                      ? "border-[#222222] text-[#222222]"
+                      : "border-transparent text-[#717171] hover:border-[#DDDDDD] hover:text-[#222222]"
+                  }`}
+                >
                   <img
                     src="/icons/all.png"
                     alt="All"
-                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                    className={`w-7 h-7 object-contain transition-opacity ${
+                      activeTopTab === "all" ? "opacity-100" : "opacity-60"
+                    }`}
                   />
                   <span
-                    className={`text-[14px] ${
-                      activeTopTab === "all"
-                        ? "font-bold text-[#222222]"
-                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    className={`text-[13px] ${
+                      activeTopTab === "all" ? "font-semibold" : "font-medium"
                     }`}
                   >
                     All
                   </span>
-                </div>
-                {activeTopTab === "all" && (
-                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
-                )}
-              </button>
+                </button>
 
-              {/* Homes */}
-              <button
-                onClick={() => setActiveTopTab("homes")}
-                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
+                {/* Homes */}
+                <button
+                  onClick={() => setActiveTopTab("homes")}
+                  className={`flex flex-col items-center gap-2 pb-2 border-b-2 transition-all cursor-pointer ${
+                    activeTopTab === "homes"
+                      ? "border-[#222222] text-[#222222]"
+                      : "border-transparent text-[#717171] hover:border-[#DDDDDD] hover:text-[#222222]"
+                  }`}
+                >
                   <img
                     src="/icons/homes.png"
                     alt="Homes"
-                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                    className={`w-7 h-7 object-contain transition-opacity ${
+                      activeTopTab === "homes" ? "opacity-100" : "opacity-60"
+                    }`}
                   />
                   <span
-                    className={`text-[14px] ${
-                      activeTopTab === "homes"
-                        ? "font-bold text-[#222222]"
-                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    className={`text-[13px] ${
+                      activeTopTab === "homes" ? "font-semibold" : "font-medium"
                     }`}
                   >
                     Homes
                   </span>
-                </div>
-                {activeTopTab === "homes" && (
-                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
-                )}
-              </button>
+                </button>
 
-              {/* Experiences */}
-              <button
-                onClick={() => setActiveTopTab("experiences")}
-                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
+                {/* Experiences */}
+                <button
+                  onClick={() => setActiveTopTab("experiences")}
+                  className={`flex flex-col items-center gap-2 pb-2 border-b-2 transition-all cursor-pointer ${
+                    activeTopTab === "experiences"
+                      ? "border-[#222222] text-[#222222]"
+                      : "border-transparent text-[#717171] hover:border-[#DDDDDD] hover:text-[#222222]"
+                  }`}
+                >
                   <img
                     src="/icons/experiences.png"
                     alt="Experiences"
-                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                    className={`w-7 h-7 object-contain transition-opacity ${
+                      activeTopTab === "experiences" ? "opacity-100" : "opacity-60"
+                    }`}
                   />
                   <span
-                    className={`text-[14px] ${
-                      activeTopTab === "experiences"
-                        ? "font-bold text-[#222222]"
-                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    className={`text-[13px] ${
+                      activeTopTab === "experiences" ? "font-semibold" : "font-medium"
                     }`}
                   >
                     Experiences
                   </span>
-                </div>
-                {activeTopTab === "experiences" && (
-                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
-                )}
-              </button>
+                </button>
 
-              {/* Services */}
-              <button
-                onClick={() => setActiveTopTab("services")}
-                className="flex flex-col items-center gap-1 pb-1 relative transition-all group cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
+                {/* Services */}
+                <button
+                  onClick={() => setActiveTopTab("services")}
+                  className={`flex flex-col items-center gap-2 pb-2 border-b-2 transition-all cursor-pointer ${
+                    activeTopTab === "services"
+                      ? "border-[#222222] text-[#222222]"
+                      : "border-transparent text-[#717171] hover:border-[#DDDDDD] hover:text-[#222222]"
+                  }`}
+                >
                   <img
                     src="/icons/services.png"
                     alt="Services"
-                    className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+                    className={`w-7 h-7 object-contain transition-opacity ${
+                      activeTopTab === "services" ? "opacity-100" : "opacity-60"
+                    }`}
                   />
                   <span
-                    className={`text-[14px] ${
-                      activeTopTab === "services"
-                        ? "font-bold text-[#222222]"
-                        : "font-medium text-[#6A6A6A] hover:text-[#222222]"
+                    className={`text-[13px] ${
+                      activeTopTab === "services" ? "font-semibold" : "font-medium"
                     }`}
                   >
                     Services
                   </span>
-                </div>
-                {activeTopTab === "services" && (
-                  <span className="absolute bottom-[-6px] left-0 right-0 h-[3px] bg-[#222222] rounded-full" />
-                )}
-              </button>
-            </nav>
+                </button>
+              </nav>
+            </div>
 
             {/* RIGHT: Become a host + Globe + Combined Pill Menu Button */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center justify-end gap-1 sm:gap-2">
               {user?.is_host ? (
                 <Link
                   href="/host"
-                  className="hidden md:flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-full hover:bg-[#F7F7F7] transition text-[#222222]"
+                  className="hidden md:flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#F7F7F7] transition text-[#222222]"
                 >
                   <PlusCircle className="w-4 h-4 text-[#FF385C]" />
                   Switch to hosting
@@ -181,14 +183,14 @@ export default function Header() {
                       toast.info("Please log in to become a host");
                     }
                   }}
-                  className="hidden md:block text-xs font-semibold px-3.5 py-2 rounded-full hover:bg-[#F7F7F7] transition text-[#222222]"
+                  className="hidden md:block text-sm font-semibold px-4 py-2.5 rounded-full hover:bg-[#F7F7F7] transition text-[#222222]"
                 >
-                  Become a host
+                  Airbnb your home
                 </Link>
               )}
 
               <button
-                className="p-2.5 rounded-full hover:bg-[#F7F7F7] transition text-[#717171] hover:text-[#222222]"
+                className="p-3 rounded-full hover:bg-[#F7F7F7] transition text-[#222222]"
                 aria-label="Language & Region"
               >
                 <Globe className="w-4 h-4" />
@@ -196,7 +198,7 @@ export default function Header() {
 
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 rounded-full hover:bg-[#F7F7F7] transition text-[#717171] hover:text-[#222222]"
+                className="p-3 rounded-full hover:bg-[#F7F7F7] transition text-[#222222]"
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -205,58 +207,54 @@ export default function Header() {
               {/* Combined Menu Pill Button */}
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <button className="flex items-center gap-2.5 p-1.5 pl-3 border border-[#DDDDDD] rounded-full hover:shadow-md transition bg-background shadow-xs">
+                  <button className="flex items-center gap-3 p-2 px-3 ml-1 border border-[#DDDDDD] rounded-full hover:shadow-md transition bg-background shadow-sm hover:border-[#DDDDDD]">
                     <Menu className="w-4 h-4 text-[#222222]" />
-                    <Avatar className="w-7 h-7">
+                    <Avatar className="w-8 h-8 -mr-1">
                       <AvatarImage src={user?.avatar_url || ""} alt={user?.name || "User"} />
-                      <AvatarFallback className="bg-muted text-xs font-bold text-[#222222]">
+                      <AvatarFallback className="bg-[#222222] text-white text-xs font-bold">
                         {user ? user.name.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
                       </AvatarFallback>
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 mt-2 shadow-xl border-[#DDDDDD]">
+                <DropdownMenuContent align="end" className="w-60 rounded-2xl p-2 mt-2 shadow-[0_2px_16px_rgba(0,0,0,0.12)] border-none">
                   {user ? (
                     <>
-                      <div className="px-3 py-2 border-b border-[#DDDDDD] mb-1">
+                      <div className="px-4 py-3 border-b border-[#DDDDDD] mb-1">
                         <p className="font-semibold text-sm line-clamp-1">{user.name}</p>
                         <p className="text-xs text-[#717171] line-clamp-1">{user.email}</p>
                       </div>
 
                       <DropdownMenuItem
-                        onClick={() => router.push("/wishlist")}
-                        className="cursor-pointer rounded-xl gap-2 py-2 text-xs font-medium"
+                        onClick={() => router.push("/trips")}
+                        className="cursor-pointer rounded-xl gap-2 py-3 px-4 text-sm font-semibold text-[#222222] hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]"
                       >
-                        <Heart className="w-4 h-4 text-[#FF385C]" />
-                        Wishlist
+                        Trips
                       </DropdownMenuItem>
 
                       <DropdownMenuItem
-                        onClick={() => router.push("/trips")}
-                        className="cursor-pointer rounded-xl gap-2 py-2 text-xs font-medium"
+                        onClick={() => router.push("/wishlist")}
+                        className="cursor-pointer rounded-xl gap-2 py-3 px-4 text-sm font-semibold text-[#222222] hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]"
                       >
-                        <Compass className="w-4 h-4 text-blue-500" />
-                        My Trips
+                        Wishlists
                       </DropdownMenuItem>
+
+                      <DropdownMenuSeparator className="my-1 bg-[#DDDDDD]" />
 
                       {user.is_host && (
                         <DropdownMenuItem
                           onClick={() => router.push("/host")}
-                          className="cursor-pointer rounded-xl gap-2 py-2 text-xs font-medium"
+                          className="cursor-pointer rounded-xl gap-2 py-3 px-4 text-sm text-[#222222] hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]"
                         >
-                          <Home className="w-4 h-4 text-emerald-500" />
-                          Host Dashboard
+                          Manage listings
                         </DropdownMenuItem>
                       )}
 
-                      <DropdownMenuSeparator className="my-1" />
-
                       <DropdownMenuItem
                         onClick={handleLogout}
-                        className="cursor-pointer rounded-xl gap-2 py-2 text-xs text-destructive focus:text-destructive"
+                        className="cursor-pointer rounded-xl gap-2 py-3 px-4 text-sm text-[#222222] hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]"
                       >
-                        <LogOut className="w-4 h-4" />
                         Log out
                       </DropdownMenuItem>
                     </>
@@ -264,25 +262,28 @@ export default function Header() {
                     <>
                       <DropdownMenuItem
                         onClick={() => openAuth("login")}
-                        className="cursor-pointer font-semibold rounded-xl py-2 text-xs"
+                        className="cursor-pointer font-semibold rounded-xl py-3 px-4 text-sm text-[#222222] hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]"
                       >
                         Log in
                       </DropdownMenuItem>
 
                       <DropdownMenuItem
                         onClick={() => openAuth("signup")}
-                        className="cursor-pointer rounded-xl py-2 text-xs"
+                        className="cursor-pointer rounded-xl py-3 px-4 text-sm text-[#222222] hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]"
                       >
                         Sign up
                       </DropdownMenuItem>
 
-                      <DropdownMenuSeparator className="my-1" />
+                      <DropdownMenuSeparator className="my-1 bg-[#DDDDDD]" />
 
                       <DropdownMenuItem
                         onClick={() => openAuth("signup")}
-                        className="cursor-pointer rounded-xl py-2 text-[#717171] text-xs"
+                        className="cursor-pointer rounded-xl py-3 px-4 text-[#222222] text-sm hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]"
                       >
-                        Become a host
+                        Airbnb your home
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer rounded-xl py-3 px-4 text-[#222222] text-sm hover:bg-[#F7F7F7] focus:bg-[#F7F7F7]">
+                        Help Centre
                       </DropdownMenuItem>
                     </>
                   )}
@@ -292,7 +293,7 @@ export default function Header() {
           </div>
 
           {/* Row 2: Big 3-Segment Search Bar Centered Directly Below Top Category Icons */}
-          <div className="pt-2 flex justify-center">
+          <div className="pt-2 pb-2 flex justify-center">
             <SearchBar />
           </div>
         </div>

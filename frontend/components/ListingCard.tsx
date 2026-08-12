@@ -102,9 +102,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listing/${listing.id}`} className="group block cursor-pointer">
-      <div className="bg-transparent border-none space-y-2">
+      <div className="bg-transparent border-none flex flex-col h-full">
         {/* Photo Container with Carousel & Badges */}
-        <div className="relative aspect-[1.05/1] w-full bg-[#EBEBEB] rounded-[18px] overflow-hidden">
+        <div className="relative aspect-[20/19] w-full bg-[#EBEBEB] rounded-[12px] overflow-hidden">
           <img
             src={photos[currentImageIndex]}
             alt={listing.title}
@@ -118,28 +118,30 @@ export default function ListingCard({ listing }: ListingCardProps) {
               <button
                 type="button"
                 onClick={handlePrevPhoto}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 text-[#222222] hover:bg-white hover:scale-105 shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-4 h-4 mr-0.5" />
               </button>
               <button
                 type="button"
                 onClick={handleNextPhoto}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 text-[#222222] hover:bg-white hover:scale-105 shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4 ml-0.5" />
               </button>
             </>
           )}
 
           {/* Carousel Dot Indicators */}
           {photos.length > 1 && (
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
               {photos.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    idx === currentImageIndex ? "bg-white scale-125" : "bg-white/60"
+                  className={`rounded-full transition-all ${
+                    idx === currentImageIndex 
+                      ? "bg-white w-[6px] h-[6px]" 
+                      : "bg-white/60 w-[5px] h-[5px]"
                   }`}
                 />
               ))}
@@ -148,7 +150,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
           {/* "Guest favourite" Badge (top-left) */}
           {isGuestFavourite && (
-            <div className="absolute top-2.5 left-2.5 bg-white/95 text-[#222222] font-semibold text-[11px] px-2.5 py-0.5 rounded-full shadow-xs backdrop-blur-xs z-10">
+            <div className="absolute top-3 left-3 bg-white/95 text-[#222222] font-semibold text-[13px] px-3 py-1 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.18)] z-10">
               Guest favourite
             </div>
           )}
@@ -157,42 +159,45 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <button
             type="button"
             onClick={handleWishlistToggle}
-            className={`absolute top-2.5 right-2.5 p-1 rounded-full transition-all duration-200 z-10 ${
+            className={`absolute top-3 right-3 p-0.5 transition-all duration-200 z-10 ${
               isHeartAnimating ? "scale-110" : "scale-100"
             }`}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart
-              className={`w-4 h-4 transition-colors stroke-[2.5] ${
+              className={`w-[26px] h-[26px] transition-colors stroke-[2] ${
                 wishlisted
                   ? "fill-[#FF385C] text-[#FF385C] stroke-[#FF385C]"
-                  : "fill-black/30 text-white stroke-white drop-shadow-md"
+                  : "fill-black/50 text-white stroke-white drop-shadow-md"
               }`}
             />
           </button>
         </div>
 
         {/* Text Content — Exact Airbnb Formatting */}
-        <div className="space-y-0.5 text-left pt-0.5">
-          {/* Row 1: Title (e.g. Apartment in Candolim) */}
-          <h3 className="font-semibold text-[14px] text-[#222222] truncate leading-tight">
-            {listing.title}
-          </h3>
-
-          {/* Row 2: Price & Rating on same line (e.g. ₹15,485 for 2 nights · ★ 4.92) */}
-          <div className="text-[13px] text-[#717171] truncate flex items-center gap-1">
-            <span>
-              {formattedTotalPrice} for {nights} {nights === 1 ? "night" : "nights"}
-            </span>
+        <div className="mt-3 text-left">
+          {/* Row 1: Title on left, Rating on right */}
+          <div className="flex justify-between items-start">
+            <h3 className="font-semibold text-[15px] text-[#222222] truncate leading-tight pr-4">
+              {listing.title}
+            </h3>
             {listing.avg_rating > 0 && (
-              <>
-                <span>·</span>
-                <span className="flex items-center gap-0.5 text-[#222222] font-medium">
-                  <Star className="w-3 h-3 fill-current text-[#222222]" />
-                  {listing.avg_rating.toFixed(2)}
-                </span>
-              </>
+              <div className="flex items-center gap-1 shrink-0 text-[#222222]">
+                <Star className="w-3 h-3 fill-current" />
+                <span className="text-[15px] font-normal leading-tight">{listing.avg_rating.toFixed(2)}</span>
+              </div>
             )}
+          </div>
+
+          {/* Row 2: Secondary Info */}
+          <div className="text-[15px] text-[#717171] truncate leading-[1.3] mt-0.5">
+            {listing.property_type ? `${listing.property_type.charAt(0).toUpperCase()}${listing.property_type.slice(1)}` : "Stay"}
+          </div>
+
+          {/* Row 3: Price */}
+          <div className="mt-1.5 flex items-baseline gap-1 text-[15px] leading-tight text-[#222222]">
+            <span className="font-semibold">{formattedTotalPrice}</span>
+            <span className="font-normal">total before taxes</span>
           </div>
         </div>
       </div>
