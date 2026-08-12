@@ -20,6 +20,9 @@ from app.models.wishlist import Wishlist  # noqa: F401
 
 from app.seed import seed_database
 
+# Routers
+from app.routers import auth, listings, bookings, host, wishlist, reviews
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -47,6 +50,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount Routers
+app.include_router(auth.router)
+app.include_router(listings.router)
+app.include_router(bookings.router)
+app.include_router(host.router)
+app.include_router(wishlist.router)
+app.include_router(reviews.router)
 
 
 @app.get("/health", tags=["Health"])
