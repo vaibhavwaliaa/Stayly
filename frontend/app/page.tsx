@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import SearchBar from "@/components/SearchBar";
 import ListingCard from "@/components/ListingCard";
 import FilterSheet from "@/components/FilterSheet";
+import DynamicMap from "@/components/DynamicMap";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -21,6 +22,8 @@ import {
   Trees,
   Compass,
   SearchX,
+  Map as MapIcon,
+  LayoutGrid,
 } from "lucide-react";
 
 // Category Pill Items
@@ -39,6 +42,7 @@ function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filterOpen, setFilterOpen] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   // Read URL params
   const location = searchParams.get("location") || "";
@@ -82,7 +86,7 @@ function HomeContent() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-background pb-16">
+    <main className="min-h-screen flex flex-col bg-background pb-16 relative">
       <Navbar />
 
       {/* Hero Search Section */}
@@ -115,18 +119,20 @@ function HomeContent() {
             })}
           </div>
 
-          {/* Filter Button */}
-          <Button
-            variant="outline"
-            onClick={() => setFilterOpen(true)}
-            className="rounded-full gap-2 text-xs font-semibold shrink-0 border shadow-xs hover:shadow-md"
-          >
-            <SlidersHorizontal className="w-4 h-4 text-[#E9385C]" />
-            Filters
-            {(minPrice || maxPrice || propertyType || amenities.length > 0) && (
-              <span className="w-2 h-2 rounded-full bg-[#E9385C]" />
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Filter Button */}
+            <Button
+              variant="outline"
+              onClick={() => setFilterOpen(true)}
+              className="rounded-full gap-2 text-xs font-semibold shrink-0 border shadow-xs hover:shadow-md"
+            >
+              <SlidersHorizontal className="w-4 h-4 text-[#E9385C]" />
+              Filters
+              {(minPrice || maxPrice || propertyType || amenities.length > 0) && (
+                <span className="w-2 h-2 rounded-full bg-[#E9385C]" />
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Results Header */}
@@ -139,7 +145,7 @@ function HomeContent() {
           </div>
         )}
 
-        {/* Listings Grid */}
+        {/* Main View: Normal Grid or Split Map View */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -177,13 +183,44 @@ function HomeContent() {
               Clear all filters
             </Button>
           </div>
+        ) : showMap ? (
+          /* Split View: Listings Left + Map Right */
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-h-[75vh] overflow-y-auto pr-2">
+              {listings.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+            <div className="h-[75vh] sticky top-24">
+              <DynamicMap listings={listings} />
+            </div>
+          </div>
         ) : (
+          /* Full Grid View */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {listings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
         )}
+      </div>
+
+      {/* Floating Map/Grid Toggle Button (Airbnb Signature Style) */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30">
+        <Button
+          onClick={() => setShowMap(!showMap)}
+          className="bg-[#222222] dark:bg-white text-white dark:text-black hover:bg-black dark:hover:bg-muted font-bold text-xs rounded-full px-6 py-6 shadow-2xl transition-all hover:scale-105 gap-2 border border-white/20"
+        >
+          {showMap ? (
+            <>
+              Show list <LayoutGrid className="w-4 h-4" />
+            </>
+          ) : (
+            <>
+              Show map <MapIcon className="w-4 h-4 text-[#E9385C]" />
+            </>
+          )}
+        </Button>
       </div>
 
       <FilterSheet open={filterOpen} onOpenChange={setFilterOpen} />
