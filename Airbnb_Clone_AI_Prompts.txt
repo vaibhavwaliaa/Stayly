@@ -1,0 +1,1230 @@
+================================================================================
+AIRBNB CLONE — COMPLETE AI-ASSISTED BUILD GUIDE
+A step-by-step sequence of prompts you paste into an AI coding assistant
+(Claude Code, Cursor, GitHub Copilot Chat, or ChatGPT/Claude in a browser)
+that takes you from an empty folder to a fully working, deployed,
+Airbnb-style booking platform — matching the SDE Fullstack "Airbnb Clone"
+assignment brief exactly.
+================================================================================
+
+------------------------------------------------------------------------------
+HOW TO USE THIS FILE
+------------------------------------------------------------------------------
+
+1. Work top to bottom, phase by phase. Do not skip phases — each one assumes
+   the previous phases already exist in your repo.
+
+2. Two kinds of lines in this file:
+
+     [YOU DO]       -> a manual action outside the AI (install something,
+                        run a terminal command, click a button on a website).
+
+     [PASTE TO AI]  -> literal text you copy and paste into your AI tool,
+                        exactly as written. Where you see <ANGLE BRACKETS>,
+                        replace with your own value (name, URL, etc).
+
+3. Best tool to use: an AGENTIC coding assistant that can read and write
+   files directly in your project folder — Claude Code (terminal, VS Code,
+   or JetBrains), or Cursor. These prompts are written for that workflow:
+   the AI creates/edits real files, runs commands, and you just review.
+
+   If you're instead using a plain chat window with no file access
+   (ChatGPT web, claude.ai without Code Execution), you'll need to manually
+   copy each code block the AI gives you into the right file path — the AI
+   will tell you the path in its response.
+
+4. After every prompt, run the line marked "VERIFY:" before moving to the
+   next prompt. Catching a broken step immediately is 10x faster than
+   debugging three phases later when five things are broken at once.
+
+5. If a step breaks and you don't immediately know why, do NOT keep
+   re-prompting randomly. Use the DEBUG PROMPT TEMPLATE at the very end of
+   this file — it's written to get you a precise diagnosis instead of the
+   AI guessing.
+
+6. A note on "exactly like Airbnb": copy the LAYOUT and UX PATTERNS — the
+   grid of listing cards, the sticky pill-shaped search bar, the split
+   gallery/booking-panel listing page, the calendar-based date picker. None
+   of that is Airbnb's intellectual property, it's just good, well-known UX.
+   Do NOT use Airbnb's actual logo, wordmark, or copyrighted photography —
+   pick your own project name (e.g. "Stayly", "Roamly", "Nestly") and use
+   placeholder/stock imagery (Section 6 covers exactly how). This is also
+   literally what the assignment brief asks for: "closely resemble the
+   Airbnb experience" — not "use Airbnb's actual branding."
+
+7. Total estimated time if you follow this file start to finish: 26-30
+   hours of focused work. Don't rush Phase 2 (database schema) — a shaky
+   schema causes rework in every phase after it.
+
+================================================================================
+CONTEXT BLOCK  —  paste this ONCE at the start of any NEW/fresh AI chat
+================================================================================
+
+If you're using an agentic tool (Claude Code / Cursor) working continuously
+in the same project, you can skip this — the AI already has your repo in
+context. If you ever open a FRESH chat session partway through, paste this
+block first, before whatever prompt you're on:
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+I'm building a full-stack Airbnb-style booking platform as a portfolio /
+assignment project. Here is the full context of the project so far:
+
+PROJECT NAME: <YOUR PROJECT NAME, e.g. "Stayly">
+PURPOSE: A functional clone of Airbnb's core browse/search/booking
+experience — NOT using Airbnb's name, logo, or branding, just the same
+interaction patterns and UX flow.
+
+TECH STACK:
+- Frontend: Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui,
+  TanStack React Query, Zustand, react-day-picker
+- Backend: FastAPI (Python), SQLAlchemy 2.0, Pydantic v2, SQLite
+- Repo layout: one repo, two folders — backend/ and frontend/
+
+DATABASE SCHEMA (8 tables):
+- users(id, name, email UNIQUE, password_hash, is_host BOOL, avatar_url,
+  created_at)
+- listings(id, host_id FK->users, title, description, property_type,
+  city, country, lat, lng, price_per_night, max_guests, bedrooms, beds,
+  bathrooms, avg_rating, is_active BOOL, created_at, updated_at)
+- listing_photos(id, listing_id FK, url, sort_order)
+- amenities(id, name UNIQUE)
+- listing_amenities(listing_id FK, amenity_id FK) -- join table
+- bookings(id, listing_id FK, guest_id FK->users, check_in DATE,
+  check_out DATE, guests_count, nightly_rate_snapshot, total_price,
+  status ENUM[confirmed,cancelled,completed], created_at)
+- reviews(id, listing_id FK, guest_id FK, booking_id FK NULLABLE,
+  rating INT 1-5, comment, created_at)
+- wishlists(id, user_id FK, listing_id FK, UNIQUE(user_id,listing_id),
+  created_at)
+
+CURRENT STATE OF THE PROJECT: <describe what's already built — e.g.
+"backend models + listings API done, starting on frontend home page">
+
+Please act as a senior full-stack engineer pair-programming with me. Ask
+me a clarifying question ONLY if something is genuinely ambiguous —
+otherwise make a sensible decision, tell me what you assumed, and keep
+going. Now here is what I need next:
+--------------------------------------------------------------------
+[END CONTEXT BLOCK — your actual next prompt goes directly after this]
+
+================================================================================
+PHASE 0 — INSTALL YOUR TOOLS  (no AI needed, do this first)
+================================================================================
+
+[YOU DO] Install, if you don't already have them:
+  - Node.js 20 LTS or newer        -> node -v to check
+  - Python 3.11 or newer           -> python3 --version to check
+  - Git                            -> git --version to check
+  - VS Code (or Cursor, which is VS Code + built-in AI)
+  - A GitHub account
+
+[YOU DO] Pick your AI coding tool. Recommended, ranked:
+  1. Claude Code (terminal, VS Code extension, or JetBrains) — reads and
+     writes files in your repo directly, runs your terminal commands for
+     you, sees errors and fixes them in the same turn. Best fit for this
+     whole file.
+  2. Cursor — same idea, different app.
+  3. ChatGPT / claude.ai in a browser — works, but you'll be manually
+     copy-pasting code into files yourself for every single prompt.
+
+[YOU DO] Create a new PUBLIC GitHub repository named airbnb-clone (or your
+own project name). Do not add a README/gitignore yet, keep it empty.
+
+[YOU DO] On your machine:
+    git clone https://github.com/<your-username>/airbnb-clone.git
+    cd airbnb-clone
+
+You're now ready for Phase 1.
+
+
+================================================================================
+PHASE 1 — REPO SKELETON & GIT SETUP
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+I'm starting a new full-stack project called <PROJECT NAME>, a clone of
+Airbnb's core browse/search/booking experience (not using Airbnb's name or
+branding — my own brand). Tech stack: Next.js 14 (TypeScript, App Router,
+Tailwind, shadcn/ui) for the frontend, FastAPI (Python, SQLAlchemy 2.0,
+Pydantic v2, SQLite) for the backend. One repo, two top-level folders.
+
+Please set up the repo skeleton:
+1. Create backend/ and frontend/ empty folders (I'll scaffold the actual
+   apps into them in the next prompts).
+2. Create a root-level .gitignore covering: Python (venv, __pycache__,
+   *.pyc, .env), Node (node_modules, .next, .env.local), and general OS
+   junk files (.DS_Store, Thumbs.db).
+3. Create a root-level README.md with just a title and a one-line
+   description for now — I'll flesh it out fully later.
+4. Run git init if it isn't already, and make an initial commit with a
+   clear commit message.
+
+Show me the exact folder structure and file contents you created.
+--------------------------------------------------------------------
+
+VERIFY: run `git log --oneline` and `ls` — you should see one commit and
+backend/, frontend/, .gitignore, README.md.
+
+================================================================================
+PHASE 2 — BACKEND SCAFFOLD (FastAPI project + dependencies)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Now scaffold the FastAPI backend inside backend/. Set it up like this:
+
+backend/
+  app/
+    __init__.py
+    main.py          <- FastAPI() instance, CORS middleware, router includes
+    config.py        <- pydantic-settings Settings class: DATABASE_URL,
+                         CORS_ORIGINS (comma-separated env var), reads .env
+    database.py       <- SQLAlchemy engine (sqlite:///./app.db) + SessionLocal
+                         + a get_db() FastAPI dependency
+  requirements.txt
+  .env.example        <- documents the env vars with example values
+  .env                <- actual local values (gitignored)
+
+Requirements to include: fastapi, uvicorn[standard], sqlalchemy, pydantic,
+pydantic-settings, python-multipart, passlib[bcrypt], python-jose[cryptography],
+python-dotenv.
+
+Set up CORS in main.py to allow the origins from settings.CORS_ORIGINS, with
+allow_credentials=True and allow all methods/headers for now.
+
+Add a GET /health endpoint that returns {"status": "ok"} so I can smoke-test
+the server immediately.
+
+After creating the files, create a Python virtual environment in backend/,
+activate it, install the requirements, and start the dev server so I can
+confirm it's running.
+--------------------------------------------------------------------
+
+VERIFY: open http://localhost:8000/health in a browser — should return
+{"status":"ok"}. Also open http://localhost:8000/docs — you should see the
+empty Swagger UI (this page will fill up with every endpoint we add from
+here on — keep it open in a tab, you'll use it constantly).
+
+
+================================================================================
+PHASE 3 — DATABASE MODELS (SQLAlchemy)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Now build the full database layer in backend/app/models/. Create one file
+per table, all inheriting from a shared declarative Base (put Base in
+database.py). Build exactly this schema:
+
+users: id PK, name, email (unique, indexed), password_hash, is_host
+  (bool, default False), avatar_url (nullable), created_at (server default
+  now).
+
+listings: id PK, host_id (FK -> users.id), title, description (Text),
+  property_type (string — values like apartment/house/cabin/villa),
+  city, country, lat (nullable float), lng (nullable float),
+  price_per_night (Numeric 10,2), max_guests (int), bedrooms (int),
+  beds (int), bathrooms (int), avg_rating (float, default 0),
+  is_active (bool, default True), created_at, updated_at.
+
+listing_photos: id PK, listing_id (FK -> listings.id), url (string),
+  sort_order (int, default 0).
+
+amenities: id PK, name (unique string).
+
+listing_amenities: pure join table — listing_id FK, amenity_id FK,
+  composite primary key on both.
+
+bookings: id PK, listing_id (FK -> listings.id), guest_id (FK -> users.id),
+  check_in (Date), check_out (Date), guests_count (int),
+  nightly_rate_snapshot (Numeric 10,2), total_price (Numeric 10,2),
+  status (Enum: confirmed/cancelled/completed, default confirmed),
+  created_at. Add a CheckConstraint that check_out > check_in.
+
+reviews: id PK, listing_id (FK), guest_id (FK -> users.id), booking_id
+  (FK -> bookings.id, NULLABLE), rating (int, 1-5, add a CheckConstraint),
+  comment (Text), created_at.
+
+wishlists: id PK, user_id (FK), listing_id (FK), created_at. Add a
+UniqueConstraint on (user_id, listing_id).
+
+Set up SQLAlchemy relationship() on both sides of every foreign key
+(e.g. Listing.host <-> User.listings, Listing.photos, Listing.amenities
+via the join table using secondary=, Listing.bookings, Listing.reviews,
+Booking.guest, Booking.listing, etc.) so I can navigate the object graph
+in either direction without manual joins.
+
+Then in main.py's startup event, call Base.metadata.create_all(bind=engine)
+so all tables get created automatically when the server starts.
+
+Show me the full contents of every model file.
+--------------------------------------------------------------------
+
+VERIFY: restart the server, then run this in the backend/ folder to confirm
+tables exist:
+    python3 -c "from app.database import engine; import sqlalchemy as sa; print(sa.inspect(engine).get_table_names())"
+You should see all 8 table names printed.
+
+
+================================================================================
+PHASE 4 — PYDANTIC SCHEMAS (API request/response shapes)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Now create backend/app/schemas/ with Pydantic v2 models that mirror the
+SQLAlchemy models from Phase 3, one file per resource. For each resource
+give me separate schemas where they differ:
+
+- a Base schema (shared fields)
+- a Create schema (fields required to create it — no id, no timestamps)
+- an Update schema (all fields optional, for PATCH-style partial updates)
+- a Read schema (includes id, timestamps, and nested relations where
+  useful — e.g. ListingRead should nest a list of PhotoRead and a list of
+  AmenityRead and a lightweight HostSummary, but should NEVER include
+  password_hash from the user)
+
+Use `model_config = ConfigDict(from_attributes=True)` on every Read schema
+so they can be constructed directly from SQLAlchemy model instances.
+
+Pay special attention to: UserRead must never expose password_hash.
+BookingCreate should take listing_id, check_in, check_out, guests_count
+only — nightly_rate_snapshot and total_price are computed server-side, not
+supplied by the client (security: never trust client-submitted prices).
+
+Show me all the schema files.
+--------------------------------------------------------------------
+
+VERIFY: ask the AI to run `python3 -c "from app.schemas import listing"` (or
+equivalent per your file layout) to confirm nothing has an import error.
+
+
+================================================================================
+PHASE 5 — SEED DATA SCRIPT
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Create backend/app/seed.py — a script that populates realistic demo data.
+It must be IDEMPOTENT: if users already exist, do nothing and return
+immediately (so re-running the server, or redeploying, never duplicates
+data or throws unique-constraint errors).
+
+Generate:
+- 4 host users (is_host=True), realistic names and emails, a bcrypt-hashed
+  dummy password "password123" for all of them (fine for a demo).
+- 18 listings spread across those 4 hosts, across at least 6 different
+  cities/countries (mix of India and 2-3 international cities), spanning
+  property_type values apartment/house/cabin/villa, with a realistic price
+  spread from roughly 1500 to 25000 (any currency unit is fine, just be
+  consistent), varied max_guests/bedrooms/beds/bathrooms, and a 2-3
+  sentence unique description per listing (don't reuse the same
+  description).
+- 10 amenities: Wifi, Kitchen, Free parking, Pool, Air conditioning,
+  Washer, Dedicated workspace, TV, Pet friendly, Self check-in. Attach a
+  random subset (4-8) of these to each listing.
+- 4 photos per listing. Use this exact list of real, freely-usable
+  Unsplash CDN photo URLs, reused across listings by index (don't invent
+  URLs):
+  https://images.unsplash.com/photo-1560448204-e02f11c3d0e2
+  https://images.unsplash.com/photo-1502672260266-1c1ef2d93688
+  https://images.unsplash.com/photo-1522708323590-d24dbb6b0267
+  https://images.unsplash.com/photo-1568605114967-8130f3a36994
+  https://images.unsplash.com/photo-1512917774080-9991f1c4c750
+  https://images.unsplash.com/photo-1505691938895-1758d7feb511
+  https://images.unsplash.com/photo-1484154218962-a197022b5858
+  https://images.unsplash.com/photo-1493809842364-78817add7ffb
+  (append "?w=1200&q=80" to each URL when you use it, for a reasonable
+  size/quality)
+- 10 bookings spread across different listings and different guest users
+  (create 3 plain guest users too, is_host=False): a mix of PAST dates
+  (status=completed), and FUTURE dates (status=confirmed). No two bookings
+  on the same listing may have overlapping date ranges — check this in the
+  script itself as you generate them.
+- 8 reviews, each tied to one of the completed bookings (matching
+  listing_id and guest_id), with varied ratings 3-5 and a genuine-sounding
+  1-2 sentence comment.
+- After inserting reviews, recompute and update avg_rating on every
+  listing that has at least one review (average of its review ratings).
+
+Wire this into main.py's startup event: after create_all(), call the seed
+function.
+
+Show me the full seed.py file, then restart the server and show me the
+row counts per table after seeding.
+--------------------------------------------------------------------
+
+VERIFY: open http://localhost:8000/docs — you don't have a /listings
+endpoint yet (that's next phase), so instead run:
+    python3 -c "from app.database import SessionLocal; from app.models.listing import Listing; db=SessionLocal(); print(db.query(Listing).count())"
+Should print 18. Restart the server a second time and confirm it still
+prints 18 (not 36) — that proves idempotency works.
+
+================================================================================
+PHASE 6 — LISTINGS API (search, filter, detail, availability)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Create backend/app/routers/listings.py and include it in main.py with
+prefix "/listings". Build these endpoints:
+
+GET /listings
+  Query params (all optional): location (string, match against city OR
+  country, case-insensitive partial match), check_in (date), check_out
+  (date), guests (int, filter max_guests >= guests), min_price, max_price,
+  property_type, amenities (repeated query param, list of amenity ids —
+  listing must have ALL of them), page (default 1), page_size (default 20,
+  max 50).
+  If check_in AND check_out are both given, EXCLUDE listings that have any
+  confirmed booking overlapping that range (reuse the overlap logic you'll
+  write in Phase 7 — put it in a shared services/availability.py now so
+  both routers can import it).
+  Return: {"items": [...ListingCard shape: id, title, city, country, cover
+  photo url, price_per_night, avg_rating, property_type...], "total":
+  <count>, "page":, "page_size":}. Only include is_active=True listings.
+
+GET /listings/{id}
+  Full detail: all listing fields, ordered list of photos, list of
+  amenities, avg_rating, review_count, and a nested host summary (id,
+  name, avatar_url, host_since = host's created_at). 404 if not found or
+  inactive.
+
+GET /listings/{id}/availability
+  Returns a list of {check_in, check_out} for every CONFIRMED booking on
+  that listing (past and future) — the frontend will use this to disable
+  those date ranges in the calendar.
+
+GET /amenities
+  Simple list of all amenities (id, name) — powers the filter checkboxes.
+
+Show me listings.py and services/availability.py in full.
+--------------------------------------------------------------------
+
+VERIFY: in Swagger UI (/docs), try GET /listings with no params — should
+return 18 items (or however many you seeded), total=18. Try
+?location=<one of your seeded cities> and confirm it narrows down
+correctly. Try GET /listings/1/availability and confirm it returns any
+bookings you seeded for listing 1.
+
+
+================================================================================
+PHASE 7 — BOOKINGS API (the core booking flow + overlap validation)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+In services/availability.py, add a function:
+
+    def has_overlap(db, listing_id, check_in, check_out,
+                     exclude_booking_id=None) -> bool
+
+It should return True if any CONFIRMED booking on that listing has
+check_in < the new check_out AND check_out > the new check_in (a half-open
+interval overlap check — this correctly allows back-to-back bookings where
+one checkout date equals another's check-in date). Support
+exclude_booking_id so the same check can be reused for "editing" a
+booking's dates later without it colliding with itself.
+
+Now create backend/app/routers/bookings.py with prefix "/bookings" (mount
+under a router that also needs the auth dependency you'll build in Phase
+9 — for now, accept a guest_id query param or header as a temporary stand-
+in and note clearly with a TODO comment that Phase 9 will replace it with
+a real authenticated user dependency):
+
+POST /bookings
+  Body: listing_id, check_in, check_out, guests_count.
+  Validate: check_out > check_in (400 if not), guests_count <= the
+  listing's max_guests (400 if not), listing exists and is_active (404 if
+  not). Call has_overlap — if True, raise HTTPException(409, "Selected
+  dates are no longer available"). Otherwise compute nightly_rate_snapshot
+  = listing.price_per_night, nights = (check_out - check_in).days,
+  total_price = nightly_rate_snapshot * nights (for now, no extra fees at
+  the API level — fees are a frontend-only display concern in the price
+  breakdown, described in Phase 12). Create and return the booking.
+
+GET /bookings/me
+  Return the current guest's bookings, newest first, each with a nested
+  lightweight listing summary (id, title, city, cover photo). Split is NOT
+  done server-side — return everything and let the frontend group into
+  upcoming/past by comparing dates to today.
+
+GET /listings/{id}/bookings
+  Owner-only (listing.host_id must match the current user — again, stub
+  the auth check with a clear TODO for Phase 9). Returns all bookings for
+  that listing.
+
+PATCH /bookings/{id}/cancel
+  Only the guest who made the booking (or the host who owns the listing)
+  can cancel. Sets status to "cancelled". 404 if not found, 403 if not
+  authorized.
+
+Show me the full bookings.py.
+--------------------------------------------------------------------
+
+VERIFY: in Swagger UI, POST a booking for listing 1 with dates that don't
+overlap your seed data — should return 200/201 with a booking object. Try
+posting the EXACT same dates again — should return 409. Try GET
+/bookings/me and confirm your new booking shows up.
+
+
+================================================================================
+PHASE 8 — HOST CRUD API (create / edit / delete listings)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Create backend/app/routers/host.py with prefix "/host" (again, stub auth
+with a clear TODO for Phase 9 — assume a current_user dependency exists
+and will be swapped in):
+
+GET /host/listings
+  All listings where host_id == current_user.id, including inactive ones,
+  each with a booking count.
+
+POST /listings   (note: goes on the listings router, not /host, since it's
+  RESTfully a listings resource — but requires the user to be a host)
+  Body matches ListingCreate: title, description, property_type, city,
+  country, lat, lng, price_per_night, max_guests, bedrooms, beds,
+  bathrooms, a list of amenity_ids, a list of photo urls. Creates the
+  listing plus its listing_amenities and listing_photos rows in one
+  transaction. Sets host_id = current_user.id, is_active = True.
+
+PUT /listings/{id}
+  Owner-only. Full update of the fields above, including replacing the
+  amenities and photos sets entirely (delete-then-recreate the join/photo
+  rows is fine for this scale).
+
+DELETE /listings/{id}
+  Owner-only. SOFT delete — set is_active = False, do not actually remove
+  the row (so past bookings/reviews referencing it stay intact). Return
+  204.
+
+GET /listings/{id}/bookings  -- already built in Phase 7, just confirm the
+  owner-only check is wired the same way here.
+
+Show me host.py, and the additions to listings.py for POST/PUT/DELETE.
+--------------------------------------------------------------------
+
+VERIFY: in Swagger UI, POST a new listing with 2 photo URLs and 3 amenity
+ids, confirm it appears in GET /listings. PUT it with a changed price,
+confirm GET /listings/{id} reflects the new price. DELETE it, confirm it
+no longer appears in GET /listings but the listing_photos/amenities rows
+are untouched in the DB (soft delete, not cascade delete).
+
+
+================================================================================
+PHASE 9 — MOCKED AUTH, WISHLIST, REVIEWS
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Now build real (but simplified) authentication and wire it into every
+endpoint that had a TODO stub in Phases 7-8. Create
+backend/app/routers/auth.py and backend/app/deps.py:
+
+POST /auth/register — body: name, email, password, is_host (bool). Hash
+  the password with passlib's bcrypt, create the user, return a JWT
+  (python-jose, HS256, a SECRET_KEY from settings/.env, 7-day expiry)
+  containing the user id as the subject claim.
+
+POST /auth/login — body: email, password. Verify against password_hash,
+  return the same JWT shape as register. 401 on mismatch.
+
+GET /auth/me — requires a valid Authorization: Bearer <token> header,
+  returns the current user (via the dependency below).
+
+In deps.py, create a get_current_user(db, token) FastAPI dependency that
+decodes the JWT, loads the user from the DB, and raises 401 if invalid/
+expired/missing. Create a get_current_host variant that additionally
+403s if is_host is False.
+
+Now go back through bookings.py and host.py and replace every stubbed
+guest_id/host check with Depends(get_current_user) or
+Depends(get_current_host), using current_user.id in place of the old
+stand-in.
+
+Finally, add:
+
+Wishlist — backend/app/routers/wishlist.py, prefix "/wishlist", all
+  routes require get_current_user:
+    POST /wishlist/{listing_id}   — add (409 if already wishlisted)
+    DELETE /wishlist/{listing_id} — remove (404 if not found)
+    GET /wishlist/me              — list of full listing cards, wishlisted
+                                      by the current user
+
+Reviews — backend/app/routers/reviews.py:
+    POST /listings/{id}/reviews   — requires get_current_user. Body:
+      rating (1-5), comment, booking_id (optional — if given, validate it
+      belongs to this user and this listing and has status=completed).
+      After inserting, recompute and update the listing's avg_rating.
+    GET /listings/{id}/reviews    — public, paginated, newest first.
+
+Show me all the new/changed files.
+--------------------------------------------------------------------
+
+VERIFY: POST /auth/register with a test guest account, copy the returned
+token, click the "Authorize" lock icon in Swagger UI and paste
+"Bearer <token>". Now POST /bookings again — it should work using your
+real logged-in identity instead of the old stand-in. Try GET /bookings/me
+without authorizing first — should 401.
+
+================================================================================
+PHASE 10 — FRONTEND SCAFFOLD (Next.js + Tailwind + shadcn/ui)
+================================================================================
+
+[YOU DO] The scaffolding tools are interactive — run these yourself in a
+terminal inside frontend/ (or let Claude Code/Cursor run them for you if
+your tool can handle interactive prompts):
+
+    npx create-next-app@latest frontend --typescript --tailwind --eslint --app --src-dir=false
+    cd frontend
+    npx shadcn@latest init
+    npx shadcn@latest add button card dialog calendar toast avatar badge dropdown-menu input select checkbox skeleton sheet separator
+    npm install @tanstack/react-query zustand react-day-picker date-fns lucide-react
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+The frontend/ folder now has a fresh Next.js 14 App Router project with
+Tailwind and shadcn/ui installed. Please:
+
+1. Create frontend/.env.local.example with NEXT_PUBLIC_API_URL=http://localhost:8000
+   and copy it to .env.local with the same value.
+
+2. Create frontend/lib/api.ts — a thin fetch wrapper: a function
+   apiFetch(path, options) that prefixes NEXT_PUBLIC_API_URL, sets
+   Content-Type: application/json, attaches an Authorization: Bearer
+   header if a token exists (read from a simple getToken() helper backed
+   by a cookie or localStorage — localStorage is fine for this project),
+   parses JSON, and throws a typed ApiError (with status + message) on
+   non-2xx responses.
+
+3. Create frontend/lib/types.ts with TypeScript interfaces mirroring the
+   backend Pydantic Read schemas: User, ListingCard, ListingDetail, Photo,
+   Amenity, Booking, Review, AvailabilityRange. Keep field names identical
+   to the backend JSON so there's no silent mismatch.
+
+4. Create frontend/lib/store.ts — a Zustand store holding: current user
+   (or null), auth token, and a wishlist Set<number> of listing ids, with
+   actions to set/clear each, persisted to localStorage using zustand's
+   persist middleware.
+
+5. Wrap the root layout (app/layout.tsx) in a client-side Providers
+   component that sets up a QueryClientProvider (React Query) and mounts
+   the shadcn Toaster.
+
+Show me all these files.
+--------------------------------------------------------------------
+
+VERIFY: run `npm run dev` in frontend/, open http://localhost:3000 — you
+should see the default Next.js starter page with no console errors.
+
+
+================================================================================
+PHASE 11 — DESIGN SYSTEM (Airbnb-style visual language)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Before building real pages, set up a consistent design system so every
+component we build after this looks cohesive and matches an Airbnb-style
+aesthetic (NOT using Airbnb's actual brand colors/logo — my own palette
+in the same spirit: warm, clean, photo-forward).
+
+1. In tailwind.config.ts, extend the theme with:
+   - a primary brand color (pick a warm coral/rose, e.g. #E9385C — close
+     in spirit to Airbnb's rausch red but distinct hex)
+   - a secondary near-black for text (#222222)
+   - a muted gray for secondary text (#717171)
+   - border-radius scale leaning rounded (cards use rounded-xl, buttons
+     rounded-full for the pill search bar)
+   - font: Inter or a similar clean sans-serif via next/font/google
+
+2. Create frontend/app/globals.css additions: a subtle card hover-lift
+   (transform + shadow transition), and utility classes for the signature
+   "pill" search bar shape and the circular icon buttons.
+
+3. Create a small design tokens reference component at
+   frontend/app/design-preview/page.tsx that renders every button variant,
+   card style, badge, and the color palette on one page, purely so I can
+   eyeball the whole system at a glance before building real pages. I'll
+   delete this route later.
+
+Show me the config and the preview page.
+--------------------------------------------------------------------
+
+VERIFY: visit http://localhost:3000/design-preview — confirm the palette,
+rounded cards, and pill-shaped elements look cohesive and Airbnb-like
+without literally copying Airbnb's exact red (#FF385C) or logo.
+
+
+================================================================================
+PHASE 12 — NAVBAR & ROOT LAYOUT
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Build frontend/components/Navbar.tsx and wire it into the root layout
+above the page content. It should be a sticky header with three zones:
+
+LEFT: project logo/wordmark (text-based is fine, e.g. bold brand-colored
+  text), links to "/".
+
+CENTER: a pill-shaped search summary button (rounded-full, border, shadow
+  on hover) showing "Anywhere | Any week | Add guests" placeholder text —
+  clicking it should, for now, just navigate to "/" (the real inline
+  search bar lives on the home page itself, built in Phase 13). On scroll
+  past ~80px, animate this pill to shrink slightly (a nice signature
+  Airbnb micro-interaction) using a scroll listener + Tailwind transition
+  classes.
+
+RIGHT: a "Become a host" text link (only shown if no user is logged in, or
+  the user's is_host is false — if is_host is true, show "Switch to
+  hosting" linking to /host instead), a globe icon (non-functional,
+  cosmetic), and an avatar/menu button. The menu button opens a
+  shadcn DropdownMenu with: if logged out — Log in / Sign up (opens a
+  simple Dialog with the two forms, calling POST /auth/login or
+  /auth/register from lib/api.ts and storing the result in the Zustand
+  store); if logged in — Wishlist, My Trips, (Host dashboard if is_host),
+  Log out.
+
+Read the current user from the Zustand store built in Phase 10.
+
+Show me Navbar.tsx and the login/signup Dialog component.
+--------------------------------------------------------------------
+
+VERIFY: click "Log in", register a brand-new test account through the
+form, confirm the navbar immediately updates to show the avatar menu
+instead of the login link, and confirm the token persists across a page
+refresh (thanks to the Zustand persist middleware).
+
+
+================================================================================
+PHASE 13 — HOME / EXPLORE PAGE (listing grid + search + filters)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Build the home page at frontend/app/page.tsx. This is the single most
+important page visually — it's the first thing anyone sees. Build:
+
+1. A horizontally-scrollable category pill row just under the navbar
+   (e.g. "Amazing views", "Cabins", "Beachfront", "Trending", "Rooms")
+   using property_type-ish cosmetic filters — clicking one narrows the
+   grid by property_type where it maps cleanly, otherwise just a visual
+   toggle. Use lucide-react icons above each label like Airbnb does.
+
+2. frontend/components/SearchBar.tsx: an inline (non-sticky, this one
+   lives in the page body) three-segment pill — Location (text input),
+   Check-in/Check-out (opens the shadcn Calendar in range-select mode via
+   a Popover), Guests (a stepper for adult/child/infant counts collapsed
+   to a total guest number for the API). On submit, push these as URL
+   search params (?location=&check_in=&check_out=&guests=) so the page is
+   shareable and the grid re-fetches based on the URL.
+
+3. frontend/components/ListingCard.tsx: cover photo (next/image, rounded
+   corners, aspect-square or 4:5), a heart-shaped wishlist toggle button
+   overlaid top-right (filled if in the Zustand wishlist set, calls
+   POST/DELETE /wishlist/{id} optimistically), title truncated to one
+   line, city + country, star icon + avg_rating (only shown if
+   review_count > 0), price_per_night formatted with your currency,
+   "/ night". Whole card links to /listing/[id].
+
+4. The grid itself: use React Query's useInfiniteQuery against
+   GET /listings with the current URL params, fetching page_size=20 per
+   page, triggering the next page load via an IntersectionObserver
+   sentinel div at the bottom of the grid (infinite scroll, not classic
+   pagination — more visually impressive for a demo). Responsive grid:
+   1 column on mobile, 2 on tablet, 3-4 on desktop
+   (grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4).
+
+5. A Filters button (opens a shadcn Sheet from the right) with: price
+   range (two number inputs or a dual slider), property type (radio/
+   select), amenities (checkboxes, fetched from GET /amenities). Applying
+   filters updates the same URL params and re-triggers the query.
+
+6. Skeleton loading state: render 8 ListingCard-shaped Skeleton
+   placeholders while the first page is loading.
+
+Show me page.tsx, SearchBar.tsx, ListingCard.tsx, and the Filters sheet
+component.
+--------------------------------------------------------------------
+
+VERIFY: the grid should show your 18 seeded listings on load. Type a
+seeded city into the location search and confirm the grid narrows.
+Toggle a heart icon and confirm it turns filled/colored instantly. Open
+filters, set a price range that excludes some listings, apply, confirm
+the grid updates. Scroll to the bottom (if you have >20 seeded, otherwise
+just confirm no errors) and confirm infinite scroll doesn't error out.
+
+
+================================================================================
+PHASE 14 — LISTING DETAIL PAGE
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Build frontend/app/listing/[id]/page.tsx, fetching GET /listings/{id} and
+GET /listings/{id}/availability with React Query. Layout (two-column on
+desktop, stacked on mobile):
+
+1. frontend/components/Gallery.tsx at the top, full width: a CSS grid —
+   one large photo on the left, a 2x2 grid of smaller photos on the right
+   (Airbnb's signature gallery layout). Clicking any photo, or a
+   "Show all photos" button in the corner, opens a shadcn Dialog with a
+   full carousel (prev/next arrows, keyboard arrow-key support) through
+   all photos.
+
+2. LEFT column below the gallery: title, city/country + a small map-pin
+   icon, a host summary row (avatar, "Hosted by <name>", "Host since
+   <year>"), a divider, the amenities list in a 2-column grid with
+   lucide-react icons matched to amenity names (wifi -> Wifi icon, etc,
+   with a sensible fallback icon for unmapped ones), a divider, the full
+   description text, a divider, and the reviews section: average rating
+   + review count as a header, then a 2-column grid of review cards
+   (reviewer name/avatar placeholder, star rating, comment, relative
+   date via date-fns).
+
+3. RIGHT column: a sticky card (sticky top-24) containing:
+   frontend/components/DateRangePicker.tsx — react-day-picker in range
+   mode, with the `disabled` prop fed the booked ranges from the
+   availability endpoint (map each {check_in, check_out} into a
+   react-day-picker DateRange to block). Below it, a guests stepper
+   capped at the listing's max_guests. Below that,
+   frontend/components/BookingSummary.tsx: once both dates are picked,
+   show nights x nightly rate = subtotal, + a flat "Cleaning fee" (pick a
+   reasonable mocked flat value), + a "Service fee" (mock as 12% of
+   subtotal), = Total, recomputed live as dates/guests change. A
+   "Reserve" button, disabled until a valid range + guest count is
+   chosen, that leads into the booking flow (Phase 15).
+
+Show me page.tsx, Gallery.tsx, DateRangePicker.tsx, and BookingSummary.tsx.
+--------------------------------------------------------------------
+
+VERIFY: click into any seeded listing, confirm the gallery opens a full
+carousel, confirm picking a date range that overlaps a seeded booking is
+visually blocked/disabled in the calendar, and confirm the price
+breakdown recalculates correctly as you change the date range.
+
+
+================================================================================
+PHASE 15 — BOOKING FLOW (mocked checkout + confirmation)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Wire up the "Reserve" button from Phase 14 into a full booking flow:
+
+1. If the user isn't logged in when they click Reserve, open the login/
+   signup Dialog from Phase 12 first (don't lose their selected dates —
+   keep them in local component state, re-open the booking dialog right
+   after successful login).
+
+2. Clicking Reserve (while logged in) opens a shadcn Dialog: a mocked
+   checkout form — card number, expiry, CVC inputs with basic format
+   masking (no real validation needed beyond looking legitimate), the
+   same price breakdown repeated for confirmation, and a
+   "Confirm and pay" button.
+
+3. On "Confirm and pay": show a ~1.5 second fake loading state
+   (a spinner or skeleton in the button, for realism), then call
+   POST /bookings with the listing id, dates, and guest count (React
+   Query useMutation).
+   - On success: close the dialog, show a success toast ("Booking
+     confirmed! Check your trips."), invalidate the availability query for
+     this listing (so the calendar immediately reflects the new blocked
+     dates), and redirect to /trips.
+   - On 409 (dates just got taken by someone else): show an error toast
+     ("Those dates were just booked — please pick another range"), close
+     the checkout dialog, and refetch availability so the calendar updates
+     to show the conflict.
+   - On any other error: a generic error toast.
+
+Show me the updated BookingSummary.tsx / new CheckoutDialog.tsx.
+--------------------------------------------------------------------
+
+VERIFY: complete a full booking end to end while logged in. Confirm the
+success toast appears and you land on /trips (even if that page is still
+a stub — build it next). Open a second browser/incognito window, log in
+as a different seeded user, try to book the SAME dates on the SAME
+listing — confirm you get the 409 toast.
+
+
+================================================================================
+PHASE 16 — MY TRIPS PAGE
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Build frontend/app/trips/page.tsx. Fetch GET /bookings/me with React
+Query (redirect to home with a toast if not logged in). Split the results
+client-side into "Upcoming" and "Past" by comparing check_in to today's
+date, each in its own section with a header. Each booking renders as a
+horizontal card: listing cover photo thumbnail, listing title (links to
+/listing/[id]), check_in - check_out formatted nicely, total_price,
+status badge (confirmed = green, cancelled = gray/strikethrough,
+completed = blue). For upcoming confirmed bookings, add a "Cancel" button
+that calls PATCH /bookings/{id}/cancel after a shadcn confirm-dialog,
+then invalidates the query. Empty state (no bookings at all) shows a
+friendly message with a button back to "/".
+
+Show me trips/page.tsx.
+--------------------------------------------------------------------
+
+VERIFY: your booking from Phase 15 should appear under Upcoming. Cancel
+it, confirm the badge updates to "cancelled" without a full page reload.
+
+================================================================================
+PHASE 17 — HOST DASHBOARD (full CRUD)
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Build the host section. If the logged-in user's is_host is false, these
+routes should redirect to "/" with a toast explaining they need to switch
+to hosting (add a simple "Switch to hosting" action that PATCHes their
+is_host flag true via a small new PATCH /auth/me endpoint — add that
+endpoint on the backend now if it doesn't exist yet).
+
+1. frontend/app/host/page.tsx — fetch GET /host/listings. Render as a
+   table or card list: cover photo thumbnail, title, city, price,
+   is_active status, booking count, and Edit / Delete actions per row. A
+   prominent "+ New listing" button top-right linking to
+   /host/listings/new. Delete opens a confirm dialog, then calls
+   DELETE /listings/{id} and optimistically removes the row (React Query
+   mutation + invalidateQueries).
+
+2. frontend/components/ListingForm.tsx — a shared form used by both
+   create and edit, covering every listing field: title, description
+   (textarea), property_type (select), city, country, lat/lng (optional
+   number inputs, or skip if you built the map bonus differently),
+   price_per_night, max_guests, bedrooms, beds, bathrooms, amenities
+   (checkboxes fetched from GET /amenities), and a repeatable "photo URL"
+   input list (an "Add another photo" button that appends a new text
+   input, minimum 1 required, a small live thumbnail preview next to each
+   URL as it's typed). Client-side validation: required fields, price > 0,
+   at least 1 photo, at least 1 amenity.
+
+3. frontend/app/host/listings/new/page.tsx — renders ListingForm in
+   "create" mode, submits to POST /listings, redirects to /host with a
+   success toast on completion.
+
+4. frontend/app/host/listings/[id]/edit/page.tsx — fetches the existing
+   listing, pre-fills ListingForm in "edit" mode, submits to
+   PUT /listings/{id}.
+
+5. frontend/app/host/listings/[id]/bookings/page.tsx (or a section within
+   the edit page — your call) — fetch GET /listings/{id}/bookings, render
+   as a simple table: guest name, dates, guest count, total price, status.
+
+Show me all of these files.
+--------------------------------------------------------------------
+
+VERIFY: switch your test account to hosting, create a brand-new listing
+through the form with 2 photos and 3 amenities, confirm it immediately
+shows up both in /host and in the public home page grid. Edit its price,
+confirm the change reflects on the public listing page. Delete it,
+confirm it disappears from /host and from the public grid but a prior
+booking (if any) on it in "My Trips" isn't broken.
+
+
+================================================================================
+PHASE 18 — WISHLIST PAGE
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Build frontend/app/wishlist/page.tsx. Fetch GET /wishlist/me (redirect to
+home with a toast if not logged in). Reuse the exact same ListingCard grid
+component from Phase 13 for consistent styling. Empty state: friendly
+message + a "Explore listings" button linking to "/". Removing the heart
+on a card here should remove it from the grid immediately (optimistic
+update via the same Zustand wishlist set + DELETE /wishlist/{id}).
+
+Show me wishlist/page.tsx.
+--------------------------------------------------------------------
+
+VERIFY: heart a few listings from the home grid, visit /wishlist, confirm
+they all appear. Un-heart one from the wishlist page itself, confirm it
+disappears from the grid without a page refresh.
+
+
+================================================================================
+PHASE 19 — POLISH: TOASTS, LOADING STATES, RESPONSIVE, DARK MODE
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Do a full polish pass across the whole app:
+
+1. Toast coverage audit — confirm every mutation (booking, cancel,
+   wishlist toggle, listing create/edit/delete, review submit, login/
+   signup success and failure) shows an appropriate success or error
+   toast. Fill in any gaps you find.
+
+2. Loading state audit — every page that fetches data on mount should show
+   shadcn Skeleton placeholders shaped like the real content (not a bare
+   spinner) while loading, and a clear empty state when a query returns
+   zero results (no bookings, no wishlist items, no search results for the
+   current filters — each with a distinct, helpful message, not a generic
+   "No data").
+
+3. Responsive audit — go through every page at three widths: 375px
+   (mobile), 768px (tablet), 1280px (desktop). Fix anything that overflows,
+   overlaps, or becomes unusable — particularly the navbar (should
+   collapse the center search pill into an icon-only trigger on mobile
+   that opens a full-screen search sheet), the listing detail page's
+   two-column layout (should stack to one column with the booking card
+   moving to a sticky bottom bar on mobile), and the host dashboard table
+   (should switch to a stacked card layout on mobile instead of a
+   horizontally-scrolling table).
+
+4. Dark mode — add a theme toggle to the navbar's dropdown menu using
+   Tailwind's dark: variant and shadcn's standard next-themes pattern.
+   Confirm every page (not just the home grid) looks correct in dark mode,
+   including form inputs and the calendar popover.
+
+Go through each of these four areas and fix what you find. Summarize what
+you changed.
+--------------------------------------------------------------------
+
+VERIFY: manually click through every page in your browser's device
+toolbar at 375px width, then toggle dark mode on and click through every
+page again. Fix anything that still looks broken.
+
+================================================================================
+PHASE 20 — BONUS FEATURES  (only start these once Phases 1-19 fully work)
+================================================================================
+
+[PASTE TO AI]  — bonus: post-stay reviews + superhost badge
+--------------------------------------------------------------------
+Add two small bonus features:
+
+1. On the listing detail page, if the current logged-in user has a
+   booking on this listing with status=completed AND they haven't already
+   reviewed it, show a "Write a review" button that opens a Dialog with a
+   star-rating input (1-5) and a comment textarea, submitting to
+   POST /listings/{id}/reviews with that booking_id attached. On success,
+   refetch the listing (to pick up the new avg_rating) and the reviews
+   list, show a success toast.
+
+2. On both ListingCard and the listing detail page's host summary, show a
+   small "Superhost" badge (a distinct color, maybe using the shadcn Badge
+   component) if the listing's avg_rating >= 4.8 AND its review_count is
+   at least 5. Compute this client-side from data you already have — no
+   new backend field needed.
+
+Show me the review dialog component and the badge logic.
+--------------------------------------------------------------------
+
+[PASTE TO AI]  — bonus: interactive map
+--------------------------------------------------------------------
+Add an interactive map using Leaflet + OpenStreetMap tiles (free, no API
+key required):
+
+    npm install leaflet react-leaflet
+    npm install -D @types/leaflet
+
+1. On the listing detail page, replace the static map-pin icon next to
+   the location text with a small embedded Leaflet map (client component,
+   dynamic-imported with ssr:false since Leaflet needs the browser window)
+   centered on the listing's lat/lng with a single marker.
+
+2. On the home page, add a "Map view" toggle button near the filters
+   button that switches the grid into a split view: listing cards in a
+   scrollable left column, a Leaflet map on the right showing a marker for
+   every currently-filtered listing, each marker popup showing the price
+   and linking to the listing.
+
+Show me the Map component and the split-view home page changes.
+--------------------------------------------------------------------
+
+
+================================================================================
+PHASE 21 — DEPLOYMENT
+================================================================================
+
+[YOU DO] Backend to Render (or Railway) — these steps are done on the
+Render/Railway website, not through your AI tool:
+  1. Push your latest commits to GitHub.
+  2. On render.com: New -> Web Service -> connect your GitHub repo.
+  3. Root Directory: backend
+  4. Build Command: pip install -r requirements.txt
+  5. Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+  6. Add environment variables: SECRET_KEY (any long random string),
+     CORS_ORIGINS (you'll fill this in after deploying the frontend, use
+     http://localhost:3000 for now), DATABASE_URL if your config.py reads
+     one (otherwise it defaults to the local sqlite file, which is fine).
+  7. Deploy. Once live, visit https://<your-service>.onrender.com/docs to
+     confirm it's up and seeded.
+
+[YOU DO] Frontend to Vercel:
+  1. On vercel.com: Add New -> Project -> import the same GitHub repo.
+  2. Root Directory: frontend
+  3. Environment variable: NEXT_PUBLIC_API_URL =
+     https://<your-render-service>.onrender.com
+  4. Deploy.
+
+[YOU DO] Go back to Render, update CORS_ORIGINS to include your real
+Vercel URL (e.g. https://<your-app>.vercel.app), redeploy the backend.
+
+[PASTE TO AI] — if anything breaks after deploying
+--------------------------------------------------------------------
+I deployed the backend to Render at <URL> and the frontend to Vercel at
+<URL>. When I load the live frontend URL, here's what's happening:
+<describe exact symptom — blank page? network error in console? specific
+error message? Paste the exact browser console error and/or Render's
+deploy logs here.>
+
+My CORS_ORIGINS env var on Render is currently set to: <paste value>
+My NEXT_PUBLIC_API_URL env var on Vercel is currently set to: <paste value>
+
+Diagnose the likely cause and tell me exactly what to change.
+--------------------------------------------------------------------
+
+VERIFY: open the live Vercel URL in an incognito window (avoids any
+cached localhost state), click through the full flow: search a listing,
+open its detail page, log in, book it, see it in My Trips, switch to
+hosting, create a listing, edit it, delete it. If every step works on the
+live URL, you're done.
+
+
+================================================================================
+PHASE 22 — README
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Write the final README.md for this repo. It must include, in this order:
+1. Project title + one-line description + links to the live frontend URL
+   and the live backend /docs URL.
+2. Tech stack (frontend and backend, bullet list).
+3. Architecture overview — a short paragraph explaining the client/API/DB
+   flow and where auth state lives.
+4. Database schema — a markdown table of all 8 tables and their key
+   columns (pull this from the models we wrote in Phase 3).
+5. API overview — a markdown table of every endpoint we built across
+   Phases 6-9, 18, method + path + one-line purpose.
+6. Local setup instructions — exact commands to run both backend and
+   frontend locally from a fresh clone, including the .env files needed.
+7. An "Assumptions & Simplifications" section — be explicit and honest
+   about what's mocked (auth simplifications, mocked payments, hot-linked
+   images instead of real upload, SQLite persistence caveats on the free
+   hosting tier).
+8. A "Bonus Features Implemented" section listing exactly which bonus
+   items from Phase 20 you actually built.
+
+Base all of this on the actual code in the repo right now — don't
+describe anything that isn't actually implemented.
+--------------------------------------------------------------------
+
+VERIFY: read the generated README top to bottom yourself and correct
+anything that doesn't match reality — a reviewer will notice a README
+that overclaims.
+
+
+================================================================================
+PHASE 23 — FINAL END-TO-END QA PASS
+================================================================================
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Act as a strict QA reviewer for this project against the following
+checklist. Go through the actual code (not just assume) and tell me,
+item by item, PASS or FAIL with a one-line reason:
+
+- [ ] Home page loads a grid of listings with photo, title, location,
+      price, rating
+- [ ] Location + date + guest search works and updates the URL
+- [ ] Price/property-type/amenity filters work
+- [ ] Infinite scroll or pagination works without duplicate/missing items
+- [ ] Listing detail page shows gallery, description, amenities, host
+      info, calendar, price breakdown, reviews
+- [ ] Calendar correctly disables already-booked date ranges
+- [ ] Booking a valid range succeeds and persists (survives a page refresh)
+- [ ] Booking an overlapping range is rejected server-side, not just
+      client-side
+- [ ] My Trips shows the booking, split into upcoming/past correctly
+- [ ] Host can create, edit, and soft-delete a listing, and it reflects
+      publicly
+- [ ] Host dashboard shows bookings per owned listing
+- [ ] Wishlist add/remove works and persists across a refresh
+- [ ] Every mutation shows a toast (success and failure paths)
+- [ ] The app is usable at 375px, 768px, and 1280px widths
+- [ ] The app was seeded with a realistic variety of hosts, listings,
+      photos, and bookings
+- [ ] The deployed live URLs (not just localhost) pass every item above
+
+For any FAIL, tell me the specific file and fix needed — don't just say
+"needs work."
+--------------------------------------------------------------------
+
+================================================================================
+REUSABLE DEBUG PROMPT TEMPLATE  —  use this any time something breaks
+================================================================================
+
+Don't just paste an error and say "fix this." Vague reports get vague
+fixes. Fill in every line below — it forces the AI to diagnose instead of
+guess, and it forces YOU to narrow down the problem before asking.
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+Something is broken. Here's everything I know:
+
+WHAT I EXPECTED: <one sentence — what should have happened>
+WHAT ACTUALLY HAPPENED: <one sentence — what happened instead>
+WHERE: <exact page URL, or exact API endpoint + method>
+EXACT ERROR TEXT: <paste the FULL error — browser console, terminal
+  stack trace, or Swagger UI response body, verbatim, not paraphrased>
+WHAT I WAS DOING RIGHT BEFORE IT BROKE: <the specific action — e.g.
+  "clicked Reserve after picking Aug 20-25">
+WHAT I'VE ALREADY TRIED: <anything you changed already, even if it
+  didn't help — so the AI doesn't suggest the same thing again>
+RELEVANT FILE(S), if you know them: <path(s), or "not sure" if you don't>
+
+Diagnose the root cause first and explain it to me in one or two
+sentences before writing any fix — I want to understand what actually
+went wrong, not just get a patch.
+--------------------------------------------------------------------
+
+
+================================================================================
+INTERVIEW-PREP PROMPT  —  use this after the app is fully built
+================================================================================
+
+The assignment is graded partly on your ability to explain your own code
+in an interview, even though you built it with AI help. Use this prompt
+to stress-test yourself BEFORE the real evaluation:
+
+[PASTE TO AI]
+--------------------------------------------------------------------
+I'm about to be interviewed about this project and need to prove I
+actually understand every part of it, not just that an AI generated it.
+Act as a strict technical interviewer. Ask me 10 questions about this
+codebase, one at a time — wait for my answer before asking the next one.
+Mix these types of questions:
+- "Why did you choose X over Y" architecture/design questions
+- "Walk me through what happens when a user does Z" trace-through
+  questions (pick a real user action, like booking or deleting a listing)
+- "What would break if you removed/changed this" questions about a
+  specific piece of code you pick from the repo
+- At least one question about the database schema and one about the
+  overlap-validation logic specifically
+
+After each answer I give, tell me honestly whether a real interviewer
+would find that answer convincing, and if not, what's missing.
+--------------------------------------------------------------------
+
+
+================================================================================
+END OF FILE
+================================================================================
+Work through Phases 0-23 in order, verify after every prompt, and use the
+Debug template whenever you're stuck instead of guessing. By the end of
+Phase 23 you'll have a fully working, deployed, seeded booking platform
+that matches the Airbnb Clone assignment brief end to end — and you'll be
+able to explain every line of it.
+
+Good luck.
