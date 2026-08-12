@@ -9,17 +9,27 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import Base, engine
 
+# Import all models so SQLAlchemy registers them with Base.metadata
+from app.models.user import User  # noqa: F401
+from app.models.listing import Listing  # noqa: F401
+from app.models.photo import ListingPhoto  # noqa: F401
+from app.models.amenity import Amenity, listing_amenities  # noqa: F401
+from app.models.booking import Booking  # noqa: F401
+from app.models.review import Review  # noqa: F401
+from app.models.wishlist import Wishlist  # noqa: F401
+
+from app.seed import seed_database
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Startup/shutdown lifecycle handler.
-    Creates all database tables on startup.
+    Creates all database tables on startup, then seeds demo data.
     """
-    # Startup: create tables
     Base.metadata.create_all(bind=engine)
+    seed_database()
     yield
-    # Shutdown: cleanup if needed
 
 
 app = FastAPI(
