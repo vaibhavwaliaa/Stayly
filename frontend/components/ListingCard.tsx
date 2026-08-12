@@ -92,7 +92,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   };
 
   const pricePerNight = listing.price_per_night;
-  const totalPriceForNights = pricePerNight * (nights || 1);
+  const totalPriceForNights = pricePerNight * (nights || 2); // Default to 2 nights like Airbnb screenshot if no date
 
   const formattedNightPrice = new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -108,9 +108,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listing/${listing.id}`} className="group block cursor-pointer">
-      <div className="bg-transparent border-none">
+      <div className="bg-transparent border-none space-y-2">
         {/* Photo Container with Carousel & Badges */}
-        <div className="relative aspect-square w-full bg-[#EBEBEB] rounded-2xl overflow-hidden mb-3">
+        <div className="relative aspect-square w-full bg-[#EBEBEB] rounded-2xl overflow-hidden">
           <img
             src={photos[currentImageIndex]}
             alt={listing.title}
@@ -124,23 +124,23 @@ export default function ListingCard({ listing }: ListingCardProps) {
               <button
                 type="button"
                 onClick={handlePrevPhoto}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
                 onClick={handleNextPhoto}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/90 text-[#222222] hover:bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </>
           )}
 
           {/* Carousel Dot Indicators (centered bottom, visible on hover) */}
           {photos.length > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
               {photos.map((_, idx) => (
                 <div
                   key={idx}
@@ -154,7 +154,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
           {/* "Guest favourite" Badge (top-left) */}
           {isGuestFavourite && (
-            <div className="absolute top-3 left-3 bg-white/95 text-[#222222] font-semibold text-[12px] px-3 py-1 rounded-full shadow-md backdrop-blur-xs z-10">
+            <div className="absolute top-2.5 left-2.5 bg-white/95 text-[#222222] font-semibold text-[11px] px-2.5 py-0.5 rounded-full shadow-md backdrop-blur-xs z-10">
               Guest favourite
             </div>
           )}
@@ -163,13 +163,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <button
             type="button"
             onClick={handleWishlistToggle}
-            className={`absolute top-3 right-3 p-1.5 rounded-full transition-all duration-200 z-10 ${
+            className={`absolute top-2.5 right-2.5 p-1 rounded-full transition-all duration-200 z-10 ${
               isHeartAnimating ? "scale-110" : "scale-100"
             }`}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart
-              className={`w-5 h-5 transition-colors stroke-[2.5] ${
+              className={`w-4 h-4 transition-colors stroke-[2.5] ${
                 wishlisted
                   ? "fill-[#FF385C] text-[#FF385C] stroke-[#FF385C]"
                   : "fill-black/30 text-white stroke-white drop-shadow-md"
@@ -178,46 +178,28 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </button>
         </div>
 
-        {/* Text Content */}
-        <div className="space-y-0.5">
-          {/* Row 1: Title (left) & Rating (right) on the SAME row */}
-          <div className="flex justify-between items-baseline gap-2">
-            <h3 className="font-semibold text-[15px] text-[#222222] line-clamp-1">
-              {listing.title}
-            </h3>
-            {listing.avg_rating > 0 ? (
-              <div className="flex items-center gap-1 text-sm font-medium text-[#222222] shrink-0">
-                <Star className="w-3.5 h-3.5 fill-current text-[#222222]" />
-                <span>{listing.avg_rating.toFixed(2)}</span>
-              </div>
-            ) : (
-              <span className="text-xs font-medium text-[#717171] shrink-0">New</span>
-            )}
-          </div>
+        {/* Text Content — Compact Airbnb Exact Layout */}
+        <div className="space-y-0.5 text-left">
+          {/* Row 1: Title (e.g. Apartment in Candolim / Title) */}
+          <h3 className="font-semibold text-[14px] text-[#222222] truncate leading-tight">
+            {listing.title}
+          </h3>
 
-          {/* Row 2: Location as gray-500 */}
-          <p className="text-[14px] text-[#717171] line-clamp-1">
-            {listing.city}, {listing.country}
-          </p>
-
-          {/* Row 3: Price */}
-          <div className="pt-1 text-[14px]">
-            {nights > 0 ? (
-              <div>
-                <span className="font-semibold text-[#222222]">
-                  {formattedTotalPrice}
-                </span>{" "}
-                <span className="text-[#717171]">
-                  for {nights} {nights === 1 ? "night" : "nights"}
+          {/* Row 2: Subtext Price & Rating on same line (e.g. ₹15,485 for 2 nights · ★ 4.92) */}
+          <div className="text-[13px] text-[#717171] truncate flex items-center gap-1">
+            <span>
+              {nights > 0
+                ? `${formattedTotalPrice} for ${nights} ${nights === 1 ? "night" : "nights"}`
+                : `${formattedNightPrice} night`}
+            </span>
+            {listing.avg_rating > 0 && (
+              <>
+                <span>·</span>
+                <span className="flex items-center gap-0.5 text-[#222222] font-medium">
+                  <Star className="w-3 h-3 fill-current text-[#222222]" />
+                  {listing.avg_rating.toFixed(2)}
                 </span>
-              </div>
-            ) : (
-              <div>
-                <span className="font-semibold text-[#222222]">
-                  {formattedNightPrice}
-                </span>{" "}
-                <span className="text-[#717171]">night</span>
-              </div>
+              </>
             )}
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
@@ -45,20 +45,6 @@ function HomeContent() {
 
   const [filterOpen, setFilterOpen] = useState(false);
   const [showMap, setShowMap] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  // Scroll listener to hide big search bar when scrolling past 120px
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY >= 120) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Read URL params
   const location = searchParams.get("location") || "";
@@ -95,10 +81,10 @@ function HomeContent() {
   const listings = data?.items || [];
   const totalCount = data?.total || 0;
 
-  // Group listings into featured section rows when on default view
+  // Group listings into featured section rows matching Airbnb screenshot
   const mumbaiListings = listings.filter((l) => l.city.toLowerCase().includes("mumbai"));
   const delhiListings = listings.filter((l) => l.city.toLowerCase().includes("delhi"));
-  const luxuryListings = listings.filter((l) => l.price_per_night >= 10000);
+  const luxuryListings = listings.filter((l) => l.price_per_night >= 6000);
 
   const handleCategorySelect = (type: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -114,20 +100,16 @@ function HomeContent() {
     <main className="min-h-screen flex flex-col bg-background pb-20 relative">
       <Navbar />
 
-      {/* Hero Big Search Bar Section (Hides on scroll >= 120px) */}
-      <div
-        className={`bg-background pt-6 pb-4 px-4 transition-all duration-300 ${
-          scrolled ? "opacity-0 h-0 overflow-hidden py-0" : "opacity-100 h-auto"
-        }`}
-      >
+      {/* Hero Big Search Bar Section */}
+      <div className="bg-background pt-5 pb-3 px-4">
         <SearchBar />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 pt-4 space-y-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 pt-2 space-y-6">
         {/* Category Filter Row & Filters Drawer Trigger */}
         <div className="flex items-center justify-between gap-4 border-b border-[#DDDDDD] pb-2">
           {/* Category Pills (No background circle, stacked icon + label, thin dark underline for active) */}
-          <div className="flex items-center gap-8 overflow-x-auto scrollbar-none py-2">
+          <div className="flex items-center gap-8 overflow-x-auto scrollbar-none py-1">
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
               const isActive = propertyType === cat.type && (cat.type !== "" || !propertyType);
@@ -135,16 +117,16 @@ function HomeContent() {
                 <button
                   key={cat.label}
                   onClick={() => handleCategorySelect(cat.type)}
-                  className={`flex flex-col items-center gap-2 shrink-0 pb-2.5 transition-all group relative px-2 rounded-xl hover:bg-[#F7F7F7] ${
+                  className={`flex flex-col items-center gap-1.5 shrink-0 pb-2 transition-all group relative px-2.5 py-1 rounded-xl hover:bg-[#F7F7F7] ${
                     isActive ? "text-[#222222] font-semibold" : "text-[#717171] hover:text-[#222222]"
                   }`}
                 >
                   <Icon
-                    className={`w-6 h-6 transition-transform group-hover:scale-105 ${
+                    className={`w-5 h-5 transition-transform group-hover:scale-105 ${
                       isActive ? "text-[#222222]" : "text-[#717171] group-hover:text-[#222222]"
                     }`}
                   />
-                  <span className="text-xs tracking-tight whitespace-nowrap">{cat.label}</span>
+                  <span className="text-[12px] tracking-tight whitespace-nowrap">{cat.label}</span>
                   {isActive && (
                     <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
                   )}
@@ -157,9 +139,9 @@ function HomeContent() {
           <Button
             variant="outline"
             onClick={() => setFilterOpen(true)}
-            className="rounded-full gap-2 text-xs font-semibold shrink-0 border border-[#DDDDDD] shadow-xs hover:shadow-md py-5 px-4 text-[#222222]"
+            className="rounded-full gap-2 text-xs font-semibold shrink-0 border border-[#DDDDDD] shadow-xs hover:shadow-md py-4 px-3.5 text-[#222222]"
           >
-            <SlidersHorizontal className="w-4 h-4 text-[#222222]" />
+            <SlidersHorizontal className="w-3.5 h-3.5 text-[#222222]" />
             Filters
             {(minPrice || maxPrice || propertyType || amenities.length > 0) && (
               <span className="w-2 h-2 rounded-full bg-[#FF385C]" />
@@ -179,9 +161,9 @@ function HomeContent() {
 
         {/* Main Content Area */}
         {isLoading ? (
-          /* Shimmer Skeleton Grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
-            {Array.from({ length: 8 }).map((_, i) => (
+          /* Shimmer Skeleton Grid (Compact 6-column desktop layout) */
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
               <ListingSkeleton key={i} />
             ))}
           </div>
@@ -213,8 +195,8 @@ function HomeContent() {
           </div>
         ) : showMap ? (
           /* Split View: Grid Left + Leaflet Map Right */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-h-[78vh] overflow-y-auto pr-2 scrollbar-none">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[78vh] overflow-y-auto pr-2 scrollbar-none">
               {listings.map((listing) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
@@ -223,35 +205,35 @@ function HomeContent() {
               <DynamicMap listings={listings} />
             </div>
           </div>
-        ) : !hasActiveFilters && (mumbaiListings.length > 0 || luxuryListings.length > 0) ? (
+        ) : !hasActiveFilters ? (
           /* Default Airbnb View: Curated Horizontal Section Rows + Grid */
-          <div className="space-y-12">
+          <div className="space-y-10">
             {mumbaiListings.length > 0 && (
               <ListingSectionRow
-                title="Popular stays in Mumbai"
+                title="Popular homes in Mumbai"
                 listings={mumbaiListings}
               />
             )}
 
             {luxuryListings.length > 0 && (
               <ListingSectionRow
-                title="Luxury retreats & villas"
+                title="Available in Goa & top retreats"
                 listings={luxuryListings}
               />
             )}
 
             {delhiListings.length > 0 && (
               <ListingSectionRow
-                title="Heritage stays in Delhi"
+                title="Popular homes in Delhi"
                 listings={delhiListings}
               />
             )}
 
-            <section className="space-y-6 pt-4 border-t border-[#DDDDDD]">
-              <h2 className="text-[22px] font-bold text-[#222222] tracking-tight">
+            <section className="space-y-4 pt-4 border-t border-[#DDDDDD]">
+              <h2 className="text-[20px] font-bold text-[#222222] tracking-tight">
                 All Places to Stay
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
                 {listings.map((listing) => (
                   <ListingCard key={listing.id} listing={listing} />
                 ))}
@@ -260,7 +242,7 @@ function HomeContent() {
           </div>
         ) : (
           /* Search / Filter Active: Full Grid View */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {listings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
@@ -268,11 +250,11 @@ function HomeContent() {
         )}
       </div>
 
-      {/* Floating Map/Grid Toggle Button (Airbnb Signature Pill) */}
+      {/* Floating Map/Grid Toggle Button */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30">
         <Button
           onClick={() => setShowMap(!showMap)}
-          className="bg-[#222222] dark:bg-white text-white dark:text-[#222222] hover:bg-black font-bold text-xs rounded-full px-6 py-6 shadow-2xl transition-all hover:scale-105 gap-2 border border-white/20"
+          className="bg-[#222222] dark:bg-white text-white dark:text-[#222222] hover:bg-black font-bold text-xs rounded-full px-6 py-5 shadow-2xl transition-all hover:scale-105 gap-2 border border-white/20"
         >
           {showMap ? (
             <>
